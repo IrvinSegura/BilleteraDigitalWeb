@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#3b3bb3" />
+    <meta name="description" content="Tu billetera digital: deposita, envía y retira dinero de forma segura." />
+    <title>Billetera Digital</title>
+    <!-- Theme class before the first paint, so a saved or system dark theme doesn't flash light. Keep the key in
+         sync with themeStorageKey in src/main.tsx. -->
+    <script>
+      var theme = 'light'
+      try {
+        var saved = localStorage.getItem('wallet.theme')
+        if (saved === 'dark' || (saved !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)) theme = 'dark'
+      } catch (e) {}
+      document.documentElement.classList.add(theme)
+      document.documentElement.style.colorScheme = theme
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
