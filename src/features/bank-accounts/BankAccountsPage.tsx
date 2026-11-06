@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Building2, Clock, Loader2, Plus, ShieldCheck, Trash2 } from 'lucide-react'
+import { Building2, Clock, Loader2, Pencil, Plus, ShieldCheck, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -113,6 +113,53 @@ function AddBankAccountDialog() {
   )
 }
 
+function RenameButton({ account }: { account: BankAccount }) {
+  const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const [open, setOpen] = useState(false)
+  const [alias, setAlias] = useState(account.alias ?? '')
+  const rename = useMutation({
+    mutationFn: () => unwrap(api.PATCH('/api/v1/bank-accounts/{bankAccountId}', {
+      params: { path: { bankAccountId: account.id! } },
+      body: { alias: alias.trim() },
+    })),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: keys.bankAccounts })
+      toast.success(t('bankAccounts.rename.saved'))
+      setOpen(false)
+    },
+  })
+  const markup = hasMarkup(alias)
+  return (
+    <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (next) { setAlias(account.alias ?? ''); rename.reset() } }}>
+      <DialogTrigger render={<Button variant="ghost" size="icon-sm" aria-label={t('bankAccounts.rename.label', { lastFour: account.clabeLastFour })} />}>
+        <Pencil />
+      </DialogTrigger>
+      <DialogContent className="p-6 sm:max-w-md">
+        <form className="grid gap-5" onSubmit={(e) => { e.preventDefault(); if (!markup) rename.mutate() }}>
+          <DialogHeader>
+            <DialogTitle>{t('bankAccounts.rename.title')}</DialogTitle>
+            <DialogDescription>{t('bankAccounts.rename.description')}</DialogDescription>
+          </DialogHeader>
+          <FormField label={t('bankAccounts.rename.alias')} hint={t('bankAccounts.rename.hint')} error={markup ? markupMessage() : undefined}>
+            {(field) => (
+              <Input {...field} autoFocus maxLength={40} placeholder={t('bankAccounts.rename.placeholder')} value={alias}
+                onChange={(e) => setAlias(e.target.value)} />
+            )}
+          </FormField>
+          <FormError message={rename.isError ? errorMessage(rename.error) : null} />
+          <DialogFooter className="gap-2">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>{t('common.cancel')}</Button>
+            <Button type="submit" disabled={rename.isPending || markup}>
+              {rename.isPending && <Loader2 className="animate-spin" />} {t('common.save')}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 function RemoveButton({ account }: { account: BankAccount }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
@@ -167,23 +214,32 @@ export function BankAccountsPage() {
             {accounts.data.map((a) => {
               const waiting = a.withdrawalsAvailableFrom && new Date(a.withdrawalsAvailableFrom) > new Date()
               return (
-                <li key={a.id} className="flex items-center gap-4 px-5 py-4">
+                <li key={a.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4">
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                     <Building2 className="size-5" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{bankName(a.bankCode)} <span className="font-mono text-sm text-muted-foreground">•••• {a.clabeLastFour}</span></p>
-                    <p className="truncate text-sm text-muted-foreground">{t('bankAccounts.addedOn', { holder: a.holderName, date: formatDate(a.createdAt) })}</p>
+                    {/* The owner's name for it comes first when there is one; the bank then goes with the details */}
+                    <p className="truncate font-medium">{a.alias ?? bankName(a.bankCode)} <span className="font-mono text-sm text-muted-foreground">•••• {a.clabeLastFour}</span></p>
+                    <p className="truncate text-sm text-muted-foreground">
+                      {a.alias && `${bankName(a.bankCode)} · `}{t('bankAccounts.addedOn', { holder: a.holderName, date: formatDate(a.createdAt) })}
+                    </p>
                   </div>
-                  {waiting ? (
-                    <span className="hidden items-center gap-1.5 rounded-full bg-warning/15 px-2.5 py-1 text-xs font-medium text-warning-foreground sm:flex dark:text-warning"
-                      title={t('bankAccounts.availableFromTitle', { date: formatDateTime(a.withdrawalsAvailableFrom) })}>
-                      <Clock className="size-3.5" /> {t('bankAccounts.availableOn', { date: formatDateTime(a.withdrawalsAvailableFrom) })}
-                    </span>
-                  ) : (
-                    <span className="hidden rounded-full bg-success/12 px-2.5 py-1 text-xs font-medium text-success sm:inline">{t('bankAccounts.ready')}</span>
-                  )}
-                  <RemoveButton account={a} />
+                  {/* On a phone its own line under the text, lined up past the icon: whether it can receive money matters there too */}
+                  <div className="order-last basis-full pl-15 sm:order-none sm:basis-auto sm:pl-0">
+                    {waiting ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-2.5 py-1 text-xs font-medium text-warning-foreground dark:text-warning"
+                        title={t('bankAccounts.availableFromTitle', { date: formatDateTime(a.withdrawalsAvailableFrom) })}>
+                        <Clock className="size-3.5 shrink-0" /> {t('bankAccounts.availableOn', { date: formatDateTime(a.withdrawalsAvailableFrom) })}
+                      </span>
+                    ) : (
+                      <span className="inline-block rounded-full bg-success/12 px-2.5 py-1 text-xs font-medium text-success">{t('bankAccounts.ready')}</span>
+                    )}
+                  </div>
+                  <div className="flex">
+                    <RenameButton account={a} />
+                    <RemoveButton account={a} />
+                  </div>
                 </li>
               )
             })}
