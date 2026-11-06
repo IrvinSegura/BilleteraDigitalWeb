@@ -1,7 +1,7 @@
 import { ArrowDownLeft, ArrowLeft, SearchX, Snowflake } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useParams } from 'react-router'
+import { Link, useParams, useSearchParams } from 'react-router'
 
 import { type MovementFilters, useMovements, useWallet } from '@/api/queries'
 import { EmptyState } from '@/components/EmptyState'
@@ -12,7 +12,7 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 
 import { BalanceCard } from './BalanceCard'
 import { BalanceHistoryCard } from './BalanceHistoryCard'
-import { countActive, MovementFilterBar } from './MovementFilterBar'
+import { countActive, filtersFrom, filtersToParams, MovementFilterBar } from './MovementFilterBar'
 import { MovementList } from './MovementList'
 
 const PAGE_SIZE = 20
@@ -21,12 +21,19 @@ export function WalletDetailPage() {
   const { t } = useTranslation()
   const { walletId = '' } = useParams()
   const wallet = useWallet(walletId)
-  const [page, setPage] = useState(0)
-  const [filters, setFilters] = useState<MovementFilters>({})
+  // In the address rather than in state, so coming back from a receipt finds the list as it was
+  const [params, setParams] = useSearchParams()
+  const query = params.toString()
+  const filters = useMemo(() => filtersFrom(new URLSearchParams(query)), [query])
+  const page = Math.max(0, Math.trunc(Number(params.get('page'))) || 0)
   const changeFilters = useCallback((next: MovementFilters) => {
-    setFilters(next)
-    setPage(0)
-  }, [])
+    setParams(filtersToParams(next), { replace: true })
+  }, [setParams])
+  const setPage = (next: number) => {
+    const withPage = filtersToParams(filters)
+    if (next > 0) withPage.set('page', String(next))
+    setParams(withPage, { replace: true })
+  }
   const invalidPeriod = !!filters.from && !!filters.to && filters.from > filters.to
   const movements = useMovements(invalidPeriod ? undefined : walletId, page, PAGE_SIZE, filters)
   const items = movements.data?.items ?? []
