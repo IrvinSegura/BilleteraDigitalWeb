@@ -68,7 +68,7 @@ describe('AdminOperationsPage', () => {
 
     expect(await screen.findByText('Depósito')).toBeInTheDocument()
     expect(screen.getByText('$150.00')).toBeInTheDocument()
-    expect(requested().toSorted()).toEqual([
+    expect(requested().filter((path) => !path.startsWith('/api/v1/admin/operations/')).toSorted()).toEqual([
       `/api/v1/admin/deposits/${ID}`,
       `/api/v1/admin/transfers/${ID}`,
       `/api/v1/admin/wallets/${ID}`,
@@ -132,5 +132,41 @@ describe('AdminOperationsPage', () => {
 
     expect(await screen.findByText('Depósito')).toBeInTheDocument()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  describe('without an id', () => {
+    const USER = '9a8b7c6d-1111-4222-8333-444455556666'
+
+    it('sums what moved in the last week and lists what is still waiting, oldest first', async () => {
+      fetchMock.mockImplementation(async (input) => {
+        const url = new URL((input as Request).url)
+        if (url.pathname.endsWith('/operations/totals')) {
+          return json(200, [
+            { kind: 'transfer', count: 3, amount: { amount: '300.00', currency: 'MXN' } },
+            { kind: 'deposit', count: 1, amount: { amount: '50.00', currency: 'USD' } },
+          ])
+        }
+        if (url.pathname.endsWith('/operations/pending')) {
+          return json(200, [{ kind: 'withdrawal', id: ID, userId: USER, walletId: ID, amount: { amount: '75.00', currency: 'MXN' }, createdAt: '2026-11-01T10:00:00Z' }])
+        }
+        return json(404, { code: 'NOT_FOUND' })
+      })
+      renderPage()
+
+      expect(await screen.findByText('3 operaciones')).toBeInTheDocument()
+      expect(screen.getByText('1 operación')).toBeInTheDocument()
+      expect(screen.getByText('Sin operaciones')).toBeInTheDocument()
+      expect(await screen.findByRole('link', { name: 'Ver' })).toHaveAttribute('href', `/admin/operations?type=withdrawal&id=${ID}`)
+      expect(screen.getByText('$75.00')).toBeInTheDocument()
+      const totals = fetchMock.mock.calls.map(([input]) => new URL((input as Request).url)).find((url) => url.pathname.endsWith('/totals'))
+      expect(totals?.searchParams.get('days')).toBe('7')
+    })
+
+    it('says when nothing is waiting', async () => {
+      fetchMock.mockImplementation(async () => json(200, []))
+      renderPage()
+
+      expect(await screen.findByText('Nada pendiente')).toBeInTheDocument()
+    })
   })
 })

@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { FileSearch, Search, SearchX } from 'lucide-react'
+import { CircleCheck, Search, SearchX } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 
 import { api, unwrap } from '@/api/client'
 import { ApiError } from '@/api/errors'
@@ -10,8 +10,9 @@ import { EmptyState } from '@/components/EmptyState'
 import { PageHeader } from '@/components/PageHeader'
 import { Skeleton } from '@/components/Skeleton'
 import { StatusBadge } from '@/components/StatusBadge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { SuggestInput, useSuggestions } from '@/components/SuggestInput'
 import { Select } from '@/components/ui/select'
 import i18n from '@/i18n'
@@ -158,6 +159,93 @@ function OperationDetail({ kind, id }: { kind: Kind; id: string }) {
   })
 }
 
+const TOTAL_KINDS = ['transfer', 'deposit', 'withdrawal'] as const
+
+/**
+ * What the page shows before a lookup: how much moved this week, by kind and currency, and the deposits and
+ * withdrawals still waiting, the oldest first since those are the ones most likely stuck.
+ */
+function OperationsOverview() {
+  const { t } = useTranslation()
+  const totals = useQuery({
+    queryKey: ['admin', 'operations', 'totals', 7],
+    queryFn: () => unwrap(api.GET('/api/v1/admin/operations/totals', { params: { query: { days: 7 } } })),
+  })
+  const pending = useQuery({
+    queryKey: ['admin', 'operations', 'pending'],
+    queryFn: () => unwrap(api.GET('/api/v1/admin/operations/pending', { params: { query: { limit: 50 } } })),
+  })
+  const items = pending.data ?? []
+
+  return (
+    <>
+      <section aria-label={t('admin.operations.totalsLabel')} className="grid gap-3">
+        <h2 className="text-sm font-medium text-muted-foreground">{t('admin.operations.overviewTitle')}</h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {TOTAL_KINDS.map((kind) => {
+            const rows = (totals.data ?? []).filter((row) => row.kind === kind)
+            const count = rows.reduce((sum, row) => sum + (row.count ?? 0), 0)
+            return (
+              <div key={kind} className="rounded-2xl border bg-card p-4">
+                <p className="text-xs text-muted-foreground">{t(`admin.operations.${kind}`)}</p>
+                {totals.isPending ? <Skeleton className="mt-2 h-7 w-24" /> : (
+                  <>
+                    <p className="mt-1 text-2xl font-semibold tracking-tight tabular">
+                      {count === 0 ? t('admin.operations.nothingYet') : t('admin.operations.operationsCount', { count })}
+                    </p>
+                    <ul className="mt-1 space-y-0.5 text-sm text-muted-foreground tabular">
+                      {rows.map((row) => <li key={row.amount?.currency}>{formatMoney(row.amount)} {row.amount?.currency}</li>)}
+                    </ul>
+                  </>
+                )}
+              </div>
+            )
+          })}
+        </div>
+        {totals.isError && <AdminError error={totals.error} onRetry={() => totals.refetch()} />}
+      </section>
+      <Card className="gap-0 py-0">
+        <CardHeader className="px-5 pt-5 pb-3">
+          <CardTitle>{t('admin.operations.pendingTitle')}</CardTitle>
+          <CardDescription>{t('admin.operations.pendingHint')}</CardDescription>
+        </CardHeader>
+        {pending.isError ? <AdminError error={pending.error} onRetry={() => pending.refetch()} />
+          : pending.isPending ? <div className="p-5"><Skeleton className="h-24" /></div>
+            : items.length === 0 ? (
+              <EmptyState icon={CircleCheck} title={t('admin.operations.pendingEmpty')} description={t('admin.operations.pendingEmptyHint')} />
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="pl-5">{t('common.type')}</TableHead>
+                    <TableHead>{t('admin.operations.user')}</TableHead>
+                    <TableHead>{t('common.amount')}</TableHead>
+                    <TableHead className="hidden md:table-cell">{t('admin.operations.waitingSince')}</TableHead>
+                    <TableHead className="pr-5 text-right"><span className="sr-only">{t('admin.operations.view')}</span></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.map((op) => (
+                    <TableRow key={op.id}>
+                      <TableCell className="pl-5 font-medium">{t(`admin.operations.${op.kind === 'withdrawal' ? 'withdrawal' : 'deposit'}`)}</TableCell>
+                      <TableCell><IdCell id={op.userId} to={`/admin/users/${op.userId}`} /></TableCell>
+                      <TableCell className="tabular">{formatMoney(op.amount)}</TableCell>
+                      <TableCell className="hidden text-muted-foreground md:table-cell">{formatDateTime(op.createdAt)}</TableCell>
+                      <TableCell className="pr-5 text-right">
+                        <Link to={`/admin/operations?type=${op.kind}&id=${op.id}`} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+                          {t('admin.operations.view')}
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+      </Card>
+    </>
+  )
+}
+
 export function AdminOperationsPage() {
   const { t } = useTranslation()
   const [params, setParams] = useSearchParams()
@@ -223,9 +311,7 @@ export function AdminOperationsPage() {
           {showInvalid && <p className="mt-2 text-xs text-destructive">{t('admin.operations.invalidId')}</p>}
         </CardContent>
       </Card>
-      {id ? <OperationDetail key={kind + id} kind={kind} id={id} /> : (
-        <Card><EmptyState icon={FileSearch} title={t('admin.operations.promptTitle')} description={t('admin.operations.promptHint')} /></Card>
-      )}
+      {id ? <OperationDetail key={kind + id} kind={kind} id={id} /> : <OperationsOverview />}
     </div>
   )
 }
