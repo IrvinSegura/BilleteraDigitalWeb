@@ -32,6 +32,8 @@ export function securityHeaders(html: string, connectOrigins: string[] = [], { t
     "style-src 'self' 'unsafe-inline'",
     // data: for the two-factor QR code, blob: for the recovery codes download
     "img-src 'self' data: blob:",
+    // blob: for the videos sent in a support chat, which reach the page as data because they need a token
+    "media-src 'self' blob:",
     "font-src 'self'",
     ["connect-src 'self'", ...connectOrigins].join(' '),
     "object-src 'none'",
