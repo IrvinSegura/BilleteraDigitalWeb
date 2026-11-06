@@ -16,6 +16,7 @@ describe('auditDetails', () => {
   it.each([
     ['USER_REGISTERED', 'role USER', 'Rol: '],
     ['SESSIONS_REVOKED', '3 ended', 'Sesiones cerradas: 3'],
+    ['USER_ROLE_CHANGED', 'role: SUPPORT, reason: Joined the team', 'Nuevo rol: Soporte. Motivo: Joined the team'],
     ['PASSWORD_CHANGED', 'all sessions ended', 'Se cerraron todas las sesiones'],
     ['USER_DISABLED', 'reason: Fraude', 'Motivo: Fraude'],
     ['USER_UNLOCKED', 'reason: Confirmó por teléfono', 'Motivo: Confirmó por teléfono'],

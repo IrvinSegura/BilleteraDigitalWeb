@@ -11,10 +11,13 @@ export const auditActions = [
   'USER_UNLOCKED',
   'USER_DISABLED',
   'USER_ENABLED',
+  'USER_ROLE_CHANGED',
   'PASSWORD_RESET_REQUESTED',
   'PASSWORD_RESET',
   'PASSWORD_CHANGED',
   'PROFILE_UPDATED',
+  'EMAIL_CHANGED',
+  'ACCOUNT_CLOSED',
   'SESSIONS_REVOKED',
   'TWO_FACTOR_ENABLED',
   'TWO_FACTOR_DISABLED',
@@ -40,6 +43,7 @@ const ID = String.raw`([0-9a-f-]{36})`
 
 // The audit log stores what the backend wrote, in English; these are the sentences it writes
 const templates: [RegExp, (...parts: string[]) => string][] = [
+  [/^role: (\S+), reason: (.+)$/s, (role, reason) => i18n.t('admin.audit.detail.roleChange', { role: labelOf('labels.roles', role), reason })],
   [/^role (\S+)$/, (role) => i18n.t('admin.audit.detail.role', { role: labelOf('labels.roles', role) })],
   [/^locked until (\S+)$/, (until) => i18n.t('admin.audit.detail.lockedUntil', { date: formatDateTime(until) })],
   [/^all sessions ended$/, () => i18n.t('admin.audit.detail.allSessionsEnded')],
