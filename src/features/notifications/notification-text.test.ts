@@ -63,6 +63,22 @@ const stored = {
     title: 'Sign-in unblocked',
     body: 'Our support team unblocked signing in to your account. You can sign in again with your password.',
   },
+  SUPPORT_CASE_ASSIGNED: {
+    title: 'New support case',
+    body: 'A user is waiting for you. Open the case to see everything said with the bot.',
+  },
+  SUPPORT_AGENT_JOINED: {
+    title: 'Support is with you',
+    body: 'An agent has joined your conversation and has everything you told the bot.',
+  },
+  SUPPORT_AGENT_REPLIED: {
+    title: 'Support replied',
+    body: 'You have a new message from support.',
+  },
+  SUPPORT_CASE_RESOLVED: {
+    title: 'Your support case was closed',
+    body: 'Tell us how it went: it only takes a moment.',
+  },
   SESSIONS_REVOKED: {
     title: 'Sessions signed out',
     body: "3 of your sessions were signed out. If it wasn't you, change your password right away.",
