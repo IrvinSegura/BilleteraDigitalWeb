@@ -18,6 +18,8 @@ import { useRetranslateErrors } from '@/i18n/use-retranslate-errors'
 import { AuthHeading } from '@/layouts/AuthLayout'
 import { message } from '@/lib/validation'
 
+import { SupportContact } from './SupportContact'
+
 const schema = z.object({
   email: z.email(message('validation.email')),
   password: z.string().min(1, message('validation.password')),
@@ -133,6 +135,7 @@ export function LoginPage() {
           <Button type="button" variant="ghost" onClick={() => { setCredentials(null); setCode(''); setError(null) }}>
             <ArrowLeft /> {t('auth.login.otherAccount')}
           </Button>
+          <SupportContact question={t('auth.login.lostTwoFactor')} />
         </form>
       </div>
     )
@@ -162,6 +165,9 @@ export function LoginPage() {
         {t('auth.login.noAccount')}{' '}
         <Link to="/register" className="font-medium text-primary hover:underline">{t('auth.login.createOne')}</Link>
       </p>
+      <div className="mt-3">
+        <SupportContact question={t('auth.login.cantSignIn')} />
+      </div>
     </div>
   )
 }
