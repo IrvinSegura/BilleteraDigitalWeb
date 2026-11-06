@@ -2,8 +2,9 @@ import { lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, Route, Routes } from 'react-router'
 
-import { FullPageLoader, GuestOnly, RequireAdmin, RequireAuth } from '@/auth/RequireAuth'
+import { FullPageLoader, GuestOnly, RequireAdmin, RequireAuth, RequireSupport } from '@/auth/RequireAuth'
 import { Skeleton } from '@/components/Skeleton'
+import { ConfirmEmailChangePage } from '@/features/auth/ConfirmEmailChangePage'
 import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
@@ -20,18 +21,24 @@ const page = <T extends Record<string, React.ComponentType>>(load: () => Promise
 const WalletsPage = page(() => import('@/features/wallets/WalletsPage'), 'WalletsPage')
 const WalletDetailPage = page(() => import('@/features/wallets/WalletDetailPage'), 'WalletDetailPage')
 const StatementPage = page(() => import('@/features/wallets/StatementPage'), 'StatementPage')
+const StatementsPage = page(() => import('@/features/statements/StatementsPage'), 'StatementsPage')
 const ReceiptPage = page(() => import('@/features/wallets/ReceiptPage'), 'ReceiptPage')
 const PayRequestPage = page(() => import('@/features/money/PayRequestPage'), 'PayRequestPage')
 const DepositReturnPage = page(() => import('@/features/money/DepositReturnPage'), 'DepositReturnPage')
 const BankAccountsPage = page(() => import('@/features/bank-accounts/BankAccountsPage'), 'BankAccountsPage')
 const NotificationsPage = page(() => import('@/features/notifications/NotificationsPage'), 'NotificationsPage')
 const SettingsPage = page(() => import('@/features/settings/SettingsPage'), 'SettingsPage')
+const SupportPage = page(() => import('@/features/support/SupportPage'), 'SupportPage')
+const SupportInboxPage = page(() => import('@/features/support/SupportInboxPage'), 'SupportInboxPage')
+const AdminSupportPage = page(() => import('@/features/admin/AdminSupportPage'), 'AdminSupportPage')
 const AdminUsersPage = page(() => import('@/features/admin/AdminUsersPage'), 'AdminUsersPage')
+const AdminWalletsPage = page(() => import('@/features/admin/AdminWalletsPage'), 'AdminWalletsPage')
 const AdminOperationsPage = page(() => import('@/features/admin/AdminOperationsPage'), 'AdminOperationsPage')
 const AdminReconciliationsPage = page(() => import('@/features/admin/AdminReconciliationsPage'), 'AdminReconciliationsPage')
 const AdminLedgerPage = page(() => import('@/features/admin/AdminLedgerPage'), 'AdminLedgerPage')
 const AdminPaymentsPage = page(() => import('@/features/admin/AdminPaymentsPage'), 'AdminPaymentsPage')
 const AdminAuditPage = page(() => import('@/features/admin/AdminAuditPage'), 'AdminAuditPage')
+const NotFoundPage = page(() => import('@/features/not-found/NotFoundPage'), 'NotFoundPage')
 
 function PageFallback() {
   const { t } = useTranslation()
@@ -65,6 +72,7 @@ export function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Route>
         <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/confirm-email-change" element={<ConfirmEmailChangePage />} />
 
         <Route element={<RequireAuth />}>
           {/* Their own layout, without the app's navigation, so they print as documents */}
@@ -74,25 +82,34 @@ export function App() {
             <Route index element={<DashboardPage />} />
             <Route path="/wallets" element={lazyPage(<WalletsPage />)} />
             <Route path="/wallets/:walletId" element={lazyPage(<WalletDetailPage />)} />
+            <Route path="/statements" element={lazyPage(<StatementsPage />)} />
             <Route path="/deposits/return" element={lazyPage(<DepositReturnPage />)} />
             {/* A payment link: signed-out payers sign in first and come back here */}
             <Route path="/send" element={lazyPage(<PayRequestPage />)} />
             <Route path="/bank-accounts" element={lazyPage(<BankAccountsPage />)} />
             <Route path="/notifications" element={lazyPage(<NotificationsPage />)} />
             <Route path="/settings" element={lazyPage(<SettingsPage />)} />
+            <Route path="/support" element={lazyPage(<SupportPage />)} />
+            <Route path="/support/inbox" element={<RequireSupport />}>
+              <Route index element={lazyPage(<SupportInboxPage />)} />
+              <Route path=":conversationId" element={lazyPage(<SupportInboxPage />)} />
+            </Route>
             <Route path="/admin" element={<RequireAdmin />}>
               <Route index element={<Navigate to="users" replace />} />
               <Route path="users" element={lazyPage(<AdminUsersPage />)} />
               <Route path="users/:userId" element={lazyPage(<AdminUsersPage />)} />
+              <Route path="wallets" element={lazyPage(<AdminWalletsPage />)} />
               <Route path="operations" element={lazyPage(<AdminOperationsPage />)} />
               <Route path="reconciliations" element={lazyPage(<AdminReconciliationsPage />)} />
               <Route path="ledger" element={lazyPage(<AdminLedgerPage />)} />
               <Route path="payments" element={lazyPage(<AdminPaymentsPage />)} />
+              <Route path="support" element={lazyPage(<AdminSupportPage />)} />
+              <Route path="support/:conversationId" element={lazyPage(<AdminSupportPage />)} />
               <Route path="audit" element={lazyPage(<AdminAuditPage />)} />
             </Route>
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={lazyPage(<NotFoundPage />)} />
       </Routes>
     </Suspense>
   )
