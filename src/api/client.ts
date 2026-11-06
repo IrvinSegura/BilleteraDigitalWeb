@@ -2,7 +2,7 @@ import createClient, { type Middleware } from 'openapi-fetch'
 
 import { currentLanguage } from '@/i18n'
 
-import { ApiError, type Problem } from './errors'
+import { ApiError, type Problem, RequestTimeoutError } from './errors'
 import type { components, paths } from './schema'
 import { session } from './session'
 
@@ -15,6 +15,39 @@ const baseUrl = import.meta.env.VITE_API_URL ?? ''
  * and the API accepts that cookie only with this header, which other sites can't add without passing CORS.
  */
 export const BROWSER_SESSION = { 'X-Session-Mode': 'cookie' } as const
+
+// Long enough for the slowest thing the API does, a call to the payment provider
+const TIMEOUT_MS = 30_000
+// An upload also depends on the user's connection, and files go up to 20 MB
+const UPLOAD_TIMEOUT_MS = 120_000
+
+/**
+ * Gives up on a call the API hasn't started answering in time, so a screen never waits forever. It stops counting
+ * once the answer starts: a large download may take longer than the wait for it.
+ */
+async function withTimeout(
+  limit: number,
+  send: (signal: AbortSignal) => Promise<Response>,
+  caller?: AbortSignal,
+): Promise<Response> {
+  const controller = new AbortController()
+  const cancel = () => controller.abort(caller?.reason)
+  if (caller?.aborted) cancel()
+  caller?.addEventListener('abort', cancel, { once: true })
+  let timedOut = false
+  const timer = setTimeout(() => {
+    timedOut = true
+    controller.abort()
+  }, limit)
+  try {
+    return await send(controller.signal)
+  } catch (error) {
+    throw timedOut ? new RequestTimeoutError() : error
+  } finally {
+    clearTimeout(timer)
+    caller?.removeEventListener('abort', cancel)
+  }
+}
 
 let onSessionExpired: () => void = () => {}
 
@@ -39,11 +72,12 @@ let refreshing: Promise<boolean> | null = null
 export function refreshSession(): Promise<boolean> {
   refreshing ??= navigator.locks
     .request('wallet.refresh', async () => {
-      const response = await fetch(`${baseUrl}/api/v1/auth/refresh`, {
+      const response = await withTimeout(TIMEOUT_MS, (signal) => fetch(`${baseUrl}/api/v1/auth/refresh`, {
         method: 'POST',
         headers: BROWSER_SESSION,
         credentials: 'include',
-      })
+        signal,
+      }))
       if (response.status === 401) {
         session.clear()
         return false
@@ -98,7 +132,15 @@ const auth: Middleware = {
  * Typed API client; pass its calls to unwrap. An expired session is renewed once per call and the call retried.
  * Credentials are included so the refresh cookie also works when the API is on another origin of the same site.
  */
-export const api = createClient<paths>({ baseUrl, credentials: 'include' })
+export const api = createClient<paths>({
+  baseUrl,
+  credentials: 'include',
+  fetch: (request) => withTimeout(
+    request.headers.get('Content-Type')?.startsWith('multipart/') ? UPLOAD_TIMEOUT_MS : TIMEOUT_MS,
+    (signal) => fetch(request, { signal }),
+    request.signal,
+  ),
+})
 api.use(auth)
 
 /** Unwraps an openapi-fetch result: the data, or throws an ApiError with the ProblemDetail. */
