@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, ChevronLeft, ChevronRight, Printer } from 'lucide-react'
+import { ArrowLeft, ChevronLeft, ChevronRight, FileDown, Loader2, Printer } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams, useSearchParams } from 'react-router'
 
-import { api, unwrap } from '@/api/client'
 import { useWallet, useWalletSummary } from '@/api/queries'
 import { useUser } from '@/auth/auth-context'
 import { ErrorState } from '@/components/ErrorState'
@@ -11,54 +10,27 @@ import { currencyName } from '@/components/CurrencyIcon'
 import { PrintDocument, PrintFields, PrintSection } from '@/components/PrintDocument'
 import { Skeleton } from '@/components/Skeleton'
 import { Button, buttonVariants } from '@/components/ui/button'
+import { fetchMonthMovements, lastDay, MONTH, shiftMonth } from '@/features/statements/statement-data'
+import { useStatementDownload } from '@/features/statements/use-statement-download'
 import { formatCalendarDate, formatDateTime, formatMoney, formatMonth, shortId } from '@/lib/format'
 import { movementLabel } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 
 import { currentMonth } from './MovementFilterBar'
-import type { Movement } from './MovementList'
 
-const PAGE_SIZE = 100
-// A month with more movements than this is cut, and the page says so
-const MAX_PAGES = 50
-
-function shiftMonth(month: string, by: number): string {
-  const [year, number] = month.split('-').map(Number)
-  const date = new Date(Date.UTC(year!, number! - 1 + by, 1))
-  return date.toISOString().slice(0, 7)
-}
-
-function lastDay(month: string): string {
-  return new Date(Date.parse(`${shiftMonth(month, 1)}-01T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10)
-}
-
-// Every movement of the month, oldest first, reading the API's pages one after another
 function useMonthMovements(walletId: string, month: string) {
   return useQuery({
     queryKey: ['wallets', walletId, 'statement', month],
-    queryFn: async () => {
-      const items: Movement[] = []
-      let page = 0
-      let hasNext = true
-      while (hasNext && page < MAX_PAGES) {
-        const result = await unwrap(api.GET('/api/v1/wallets/{walletId}/movements', {
-          params: { path: { walletId }, query: { page, size: PAGE_SIZE, from: `${month}-01`, to: lastDay(month) } },
-        }))
-        items.push(...(result.items ?? []))
-        hasNext = !!result.hasNext
-        page++
-      }
-      return { items: items.reverse(), cut: hasNext }
-    },
+    queryFn: () => fetchMonthMovements(walletId, month),
   })
 }
 
-/** A month's statement of one wallet, laid out to print or save as PDF from the browser. */
+/** A month's statement of one wallet, laid out to print, and to download as a PDF file. */
 export function StatementPage() {
   const { t } = useTranslation()
   const { walletId = '' } = useParams()
   const [params, setParams] = useSearchParams()
-  const month = /^\d{4}-(0[1-9]|1[0-2])$/.test(params.get('month') ?? '') ? params.get('month')! : currentMonth()
+  const month = MONTH.test(params.get('month') ?? '') ? params.get('month')! : currentMonth()
   const user = useUser()
   const wallet = useWallet(walletId)
   const summary = useWalletSummary(walletId, month)
@@ -67,6 +39,7 @@ export function StatementPage() {
   const error = wallet.error ?? summary.error ?? movements.error
   const currency = wallet.data?.balance?.currency
   const heading = title.charAt(0).toUpperCase() + title.slice(1)
+  const download = useStatementDownload()
   const period = t('wallets.statement.period', { from: formatCalendarDate(`${month}-01`), to: formatCalendarDate(lastDay(month)) })
 
   return (
@@ -85,8 +58,17 @@ export function StatementPage() {
             <ChevronRight />
           </Button>
         </div>
-        <Button size="sm" onClick={() => window.print()} disabled={movements.isPending}>
+        <Button variant="outline" size="sm" onClick={() => window.print()} disabled={movements.isPending}>
           <Printer /> {t('wallets.statement.print')}
+        </Button>
+        <Button size="sm" disabled={!currency || !summary.data || !movements.data || download.isPending}
+          onClick={() => download.mutate({
+            month, general: false, wallets: [{ id: walletId, currency: currency! }],
+            statements: [{
+              walletId, currency: currency!, ...summary.data!, movements: movements.data!.items, cut: movements.data!.cut,
+            }],
+          })}>
+          {download.isPending ? <Loader2 className="animate-spin" /> : <FileDown />} {t('wallets.statement.download')}
         </Button>
       </div>
 
@@ -156,7 +138,14 @@ export function StatementPage() {
                       {movements.data.items.map((m) => (
                         <tr key={`${m.transactionId}-${m.direction}`} className="break-inside-avoid even:bg-slate-50">
                           <td className="border-b border-slate-200 px-2.5 py-1.5 whitespace-nowrap text-slate-600">{formatDateTime(m.createdAt)}</td>
-                          <td className="border-b border-slate-200 px-2.5 py-1.5 text-slate-900">{movementLabel(m.type, m.direction)}</td>
+                          <td className="border-b border-slate-200 px-2.5 py-1.5 text-slate-900">
+                            {movementLabel(m.type, m.direction)}
+                            {(m.counterpartyName || m.description) && (
+                              <span className="block text-[7.5pt] text-slate-500">
+                                {[m.counterpartyName, m.description].filter(Boolean).join(' · ')}
+                              </span>
+                            )}
+                          </td>
                           <td className="border-b border-slate-200 px-2.5 py-1.5 font-mono text-[7.5pt] text-slate-500 uppercase">{shortId(m.operationId)}</td>
                           <td className="border-b border-slate-200 px-2.5 py-1.5 text-right whitespace-nowrap text-red-700 tabular-nums">
                             {m.direction === 'IN' ? '' : `−${formatMoney(m.amount)}`}

@@ -62,6 +62,10 @@ export function formatDateTime(iso: string | undefined, locale?: string): string
   return iso ? dateFormat(DATE_TIME, locale).format(new Date(iso)) : '—'
 }
 
+export function formatTime(iso: string | undefined): string {
+  return iso ? dateFormat({ hour: 'numeric', minute: '2-digit' }).format(new Date(iso)) : '—'
+}
+
 export function formatDate(iso: string | undefined): string {
   return iso ? dateFormat(DATE_ONLY).format(new Date(iso)) : '—'
 }

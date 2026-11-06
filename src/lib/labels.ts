@@ -4,10 +4,13 @@ import {
   BadgeCheck,
   Banknote,
   Building2,
+  CircleCheck,
+  Headset,
   KeyRound,
   Landmark,
   Lock,
   type LucideIcon,
+  MessageCircle,
   PartyPopper,
   RotateCcw,
   ShieldCheck,
@@ -60,6 +63,21 @@ export const walletStatus: Record<string, StatusStyle> = {
 export const userStatus: Record<string, StatusStyle> = {
   ACTIVE: { labelKey: 'labels.userStatus.ACTIVE', tone: 'success' },
   DISABLED: { labelKey: 'labels.userStatus.DISABLED', tone: 'danger' },
+  CLOSED: { labelKey: 'labels.userStatus.CLOSED', tone: 'neutral' },
+}
+
+export const supportStatus: Record<string, StatusStyle> = {
+  BOT: { labelKey: 'labels.supportStatus.BOT', tone: 'neutral' },
+  QUEUED: { labelKey: 'labels.supportStatus.QUEUED', tone: 'warning' },
+  ASSIGNED: { labelKey: 'labels.supportStatus.ASSIGNED', tone: 'info' },
+  RESOLVED: { labelKey: 'labels.supportStatus.RESOLVED', tone: 'success' },
+}
+
+export const botMiss: Record<string, StatusStyle> = {
+  NOT_HELPED: { labelKey: 'labels.botMiss.NOT_HELPED', tone: 'danger' },
+  NOT_FOUND: { labelKey: 'labels.botMiss.NOT_FOUND', tone: 'warning' },
+  SUGGESTED: { labelKey: 'labels.botMiss.SUGGESTED', tone: 'info' },
+  ASKED_AGAIN: { labelKey: 'labels.botMiss.ASKED_AGAIN', tone: 'neutral' },
 }
 
 export const operationStatus: Record<string, StatusStyle> = {
@@ -92,6 +110,10 @@ export const notificationVisuals: Record<string, { icon: LucideIcon; tone: Tone 
   BANK_ACCOUNT_ADDED: { icon: Building2, tone: 'warning' },
   TWO_FACTOR_ENABLED: { icon: ShieldCheck, tone: 'success' },
   TWO_FACTOR_DISABLED: { icon: ShieldOff, tone: 'warning' },
+  SUPPORT_CASE_ASSIGNED: { icon: Headset, tone: 'info' },
+  SUPPORT_AGENT_JOINED: { icon: Headset, tone: 'info' },
+  SUPPORT_AGENT_REPLIED: { icon: MessageCircle, tone: 'info' },
+  SUPPORT_CASE_RESOLVED: { icon: CircleCheck, tone: 'success' },
 }
 
 export const defaultNotificationVisual = { icon: BadgeCheck, tone: 'neutral' as Tone }

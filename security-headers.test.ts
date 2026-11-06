@@ -15,6 +15,10 @@ const html = `<html><head>
 const directive = (csp: string, name: string) => csp.split('; ').find((d) => d.startsWith(`${name} `))
 
 describe('securityHeaders', () => {
+  it('lets the page play the videos of a support chat, which reach it as blobs', () => {
+    expect(directive(securityHeaders(html)['Content-Security-Policy']!, 'media-src')).toBe("media-src 'self' blob:")
+  })
+
   it('allows only the hash of the inline script, not data blocks or bundles', () => {
     const csp = securityHeaders(html)['Content-Security-Policy']!
     const hash = createHash('sha256').update(inline).digest('base64')

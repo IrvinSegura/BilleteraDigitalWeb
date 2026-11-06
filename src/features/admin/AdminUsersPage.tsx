@@ -1,15 +1,17 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Loader2, LockOpen, Search, ShieldOff, Snowflake, Sun, UserCheck, UserX, Users } from 'lucide-react'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ArrowLeft, Headset, Loader2, LockOpen, Search, ShieldOff, Snowflake, Sun, UserCheck, UserX, Users } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 
 import { api, type Schemas, unwrap } from '@/api/client'
 import { errorMessage, hasCode } from '@/api/errors'
 import { EmptyState } from '@/components/EmptyState'
 import { FormError } from '@/components/ErrorState'
 import { PageHeader } from '@/components/PageHeader'
-import { Skeleton } from '@/components/Skeleton'
+import { Pager } from '@/components/Pager'
+import { SegmentedControl } from '@/components/SegmentedControl'
+import { ListSkeleton, Skeleton } from '@/components/Skeleton'
 import { StatusBadge } from '@/components/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,10 +20,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Avatar } from '@/layouts/UserMenu'
 import { formatDate, formatDateTime, formatMoney } from '@/lib/format'
 import { labelOf, userStatus, walletStatus } from '@/lib/labels'
+import { cn } from '@/lib/utils'
 
-import { AdminError, BooleanPill, DetailGrid, IdCell, ReasonAction, useUserSuggestions } from './shared'
+import { AdminError, AdminStats, BooleanPill, DetailGrid, IdCell, ReasonAction, useListParams, useUserSuggestions } from './shared'
 
 type AdminUser = Schemas['AdminUserResponse']
+
+const PAGE_SIZE = 20
+const FILTERS = { status: ['ACTIVE', 'DISABLED', 'CLOSED'], role: ['USER', 'SUPPORT', 'ADMIN'] } as const
 
 function SearchBox() {
   const { t } = useTranslation()
@@ -63,7 +69,11 @@ function UserWallets({ userId }: { userId: string }) {
     queryKey: ['admin', 'users', userId, 'wallets'],
     queryFn: () => unwrap(api.GET('/api/v1/admin/users/{userId}/wallets', { params: { path: { userId } } })),
   })
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin', 'users', userId, 'wallets'] })
+  const refresh = () => Promise.all([
+    queryClient.invalidateQueries({ queryKey: ['admin', 'users', userId, 'wallets'] }),
+    // The platform's list of wallets and its counts changed too
+    queryClient.invalidateQueries({ queryKey: ['admin', 'wallets'] }),
+  ])
 
   return (
     <Card className="gap-0 pb-0">
@@ -125,13 +135,20 @@ function UserDetail({ userId }: { userId: string }) {
     queryKey: ['admin', 'users', userId],
     queryFn: () => unwrap(api.GET('/api/v1/admin/users/{userId}', { params: { path: { userId } } })),
   })
-  const setUser = (next: AdminUser) => queryClient.setQueryData(['admin', 'users', userId], next)
+  const setUser = (next: AdminUser) => {
+    queryClient.setQueryData(['admin', 'users', userId], next)
+    // The list and its counts show this account's state too
+    void queryClient.invalidateQueries({ queryKey: ['admin', 'users', 'list'] })
+    void queryClient.invalidateQueries({ queryKey: ['admin', 'users', 'stats'] })
+  }
   const path = { params: { path: { userId } } }
 
   if (user.isPending) return <Skeleton className="h-56 rounded-xl" />
   if (user.isError) return <AdminError error={user.error} onRetry={() => user.refetch()} />
   const u = user.data
   const disabled = u.status === 'DISABLED'
+  // Its owner closed it: there is nothing left to change
+  const closed = u.status === 'CLOSED'
 
   return (
     <div className="space-y-6">
@@ -163,7 +180,17 @@ function UserDetail({ userId }: { userId: string }) {
                   await user.refetch()
                 }} />
             )}
-            {u.role !== 'ADMIN' && (
+            {u.role !== 'ADMIN' && !closed && (
+              <ReasonAction trigger={<><Headset /> {t(u.role === 'SUPPORT' ? 'admin.users.removeSupport' : 'admin.users.makeSupport')}</>}
+                title={t(u.role === 'SUPPORT' ? 'admin.users.removeSupportTitle' : 'admin.users.makeSupportTitle')}
+                description={t(u.role === 'SUPPORT' ? 'admin.users.removeSupportHint' : 'admin.users.makeSupportHint')}
+                confirmLabel={t(u.role === 'SUPPORT' ? 'admin.users.removeSupport' : 'admin.users.makeSupport')}
+                destructive={u.role === 'SUPPORT'}
+                onConfirm={async (reason) => setUser(await unwrap(api.POST('/api/v1/admin/users/{userId}/role', {
+                  ...path, body: { role: u.role === 'SUPPORT' ? 'USER' : 'SUPPORT', reason },
+                })))} />
+            )}
+            {u.role !== 'ADMIN' && !closed && (
               <ReasonAction
                 trigger={disabled ? <><UserCheck /> {t('admin.users.enable')}</> : <><UserX /> {t('admin.users.disable')}</>}
                 title={t(disabled ? 'admin.users.enableTitle' : 'admin.users.disableTitle')}
@@ -193,6 +220,92 @@ function UserDetail({ userId }: { userId: string }) {
   )
 }
 
+/** Every account, the newest first, with how many there are of each kind above. */
+function UserList() {
+  const { t } = useTranslation()
+  const { filters, page, setFilter, setPage } = useListParams(FILTERS)
+  const { status, role } = filters
+
+  const stats = useQuery({
+    queryKey: ['admin', 'users', 'stats'],
+    queryFn: () => unwrap(api.GET('/api/v1/admin/users/stats')),
+  })
+  const users = useQuery({
+    queryKey: ['admin', 'users', 'list', status, role, page],
+    queryFn: () => unwrap(api.GET('/api/v1/admin/users', {
+      params: { query: { status: status || undefined, role: role || undefined, page, size: PAGE_SIZE } },
+    })),
+    placeholderData: keepPreviousData,
+  })
+  const items = users.data?.items ?? []
+
+  return (
+    <>
+      <AdminStats label={t('admin.users.statsLabel')} loading={stats.isPending} tiles={[
+        { label: t('admin.users.total'), value: stats.data?.total },
+        { label: t('admin.users.activeCount'), value: stats.data?.active },
+        { label: t('admin.users.disabledCount'), value: stats.data?.disabled, tone: 'danger' },
+        { label: t('admin.users.unverifiedCount'), value: stats.data?.unverified, tone: 'warning' },
+        { label: t('admin.users.adminsCount'), value: stats.data?.admins },
+      ]} />
+      <div className="flex flex-wrap gap-2">
+        <SegmentedControl label={t('admin.users.statusFilter')} value={status} onChange={(next) => setFilter('status', next)} options={[
+          { value: '', label: t('admin.users.allStatuses') },
+          { value: 'ACTIVE', label: t('labels.userStatus.ACTIVE') },
+          { value: 'DISABLED', label: t('labels.userStatus.DISABLED') },
+          { value: 'CLOSED', label: t('labels.userStatus.CLOSED') },
+        ]} />
+        <SegmentedControl label={t('admin.users.roleFilter')} value={role} onChange={(next) => setFilter('role', next)} options={[
+          { value: '', label: t('admin.users.allRoles') },
+          { value: 'USER', label: t('labels.roles.USER') },
+          { value: 'SUPPORT', label: t('labels.roles.SUPPORT') },
+          { value: 'ADMIN', label: t('labels.roles.ADMIN') },
+        ]} />
+      </div>
+      {users.isError ? <AdminError error={users.error} onRetry={() => users.refetch()} /> : (
+        <Card className="gap-0 py-0">
+          {users.isPending ? <ListSkeleton rows={6} /> : items.length === 0 ? (
+            <EmptyState icon={Users} title={t('admin.users.emptyTitle')} description={t('admin.users.emptyHint')} />
+          ) : (
+            <div className={cn(users.isPlaceholderData && 'opacity-60 transition-opacity')}>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="pl-5">{t('admin.users.account')}</TableHead>
+                    <TableHead>{t('common.status')}</TableHead>
+                    <TableHead className="hidden sm:table-cell">{t('admin.users.role')}</TableHead>
+                    <TableHead className="hidden pr-5 md:table-cell">{t('admin.users.joined')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.map((u) => (
+                    <TableRow key={u.id}>
+                      <TableCell className="max-w-56 pl-5 sm:max-w-none">
+                        <Link to={`/admin/users/${u.id}`} className="block truncate font-medium text-primary hover:underline">{u.fullName ?? u.email}</Link>
+                        <span className="block truncate text-xs text-muted-foreground">{u.email}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="flex flex-wrap items-center gap-1.5">
+                          <StatusBadge value={u.status} map={userStatus} />
+                          {u.locked && <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">{t('admin.users.locked')}</span>}
+                          {!u.emailVerified && <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">{t('admin.users.unverified')}</span>}
+                        </span>
+                      </TableCell>
+                      <TableCell className="hidden text-muted-foreground sm:table-cell">{u.role ? labelOf('labels.roles', u.role) : '—'}</TableCell>
+                      <TableCell className="hidden pr-5 text-muted-foreground md:table-cell">{formatDate(u.createdAt)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+          <Pager page={page} hasNext={!!users.data?.hasNext} onPageChange={setPage} disabled={users.isFetching} />
+        </Card>
+      )}
+    </>
+  )
+}
+
 export function AdminUsersPage() {
   const { t } = useTranslation()
   const { userId } = useParams()
@@ -200,9 +313,14 @@ export function AdminUsersPage() {
     <div className="space-y-6">
       <PageHeader title={t('admin.users.title')} description={t('admin.users.description')} />
       <Card><CardContent><SearchBox /></CardContent></Card>
-      {userId ? <UserDetail key={userId} userId={userId} /> : (
-        <Card><EmptyState icon={Users} title={t('admin.users.promptTitle')} description={t('admin.users.promptHint')} /></Card>
-      )}
+      {userId ? (
+        <>
+          <Link to="/admin/users" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <ArrowLeft className="size-4" /> {t('admin.users.backToList')}
+          </Link>
+          <UserDetail key={userId} userId={userId} />
+        </>
+      ) : <UserList />}
     </div>
   )
 }

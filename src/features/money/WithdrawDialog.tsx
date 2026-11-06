@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
-import { ArrowLeft, Building2, Clock, Loader2 } from 'lucide-react'
+import { ArrowLeft, Building2, Clock } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
 import { api, unwrap } from '@/api/client'
-import { errorMessage, hasCode } from '@/api/errors'
+import { hasCode, moneyErrorMessage, outcomeUnknown } from '@/api/errors'
 import { useBankAccounts, useWallets } from '@/api/queries'
 import { useUser } from '@/auth/auth-context'
 import { AmountInput } from '@/components/AmountInput'
@@ -18,7 +18,7 @@ import { bankName } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 
 import {
-  DailyLimitNote, defaultWalletId, Outcome, parseAmount, SummaryList, useAfterMoneyMoved, useDailyLimit,
+  DailyLimitNote, defaultWalletId, Outcome, parseAmount, ProcessingLabel, SummaryList, useAfterMoneyMoved, useDailyLimit,
   VerifyEmailNotice, WalletSelect,
 } from './shared'
 import { StepUpField, stepUpRequested, useStepUp } from './step-up'
@@ -28,7 +28,9 @@ export function WithdrawDialog({ walletId: preferred, onClose }: { walletId?: st
   const user = useUser()
   const { data: wallets } = useWallets()
   const bankAccounts = useBankAccounts()
-  const [walletId, setWalletId] = useState(() => defaultWalletId(wallets, preferred))
+  // Until the user picks one: the wallets may still be loading when the dialog opens
+  const [pickedWallet, setWalletId] = useState('')
+  const walletId = pickedWallet || defaultWalletId(wallets, preferred)
   const [chosenAccountId, setBankAccountId] = useState('')
   const [amount, setAmount] = useState('')
   const [step, setStep] = useState<'form' | 'review'>('form')
@@ -61,11 +63,15 @@ export function WithdrawDialog({ walletId: preferred, onClose }: { walletId?: st
       body: { amount: value!, bankAccountId: needsBank ? bankAccountId : undefined, ...stepUp.fields },
     })),
     onSuccess: afterMoneyMoved,
-    onError: (error) => stepUp.handle(error),
+    onError: (error) => {
+      stepUp.handle(error)
+      // It may have gone through, and the balance on screen would be out of date
+      if (outcomeUnknown(error)) afterMoneyMoved()
+    },
   })
   const shownError = withdraw.isError && !stepUpRequested(withdraw.error)
     && !hasCode(withdraw.error, 'INVALID_TWO_FACTOR_CODE') && !hasCode(withdraw.error, 'INCORRECT_PASSWORD')
-    ? errorMessage(withdraw.error) : null
+    ? moneyErrorMessage(withdraw.error) : null
 
   if (!user.emailVerified) {
     return (
@@ -90,7 +96,7 @@ export function WithdrawDialog({ walletId: preferred, onClose }: { walletId?: st
           description={t(failed ? 'money.withdraw.failedHint' : paid ? 'money.withdraw.paidHint' : 'money.withdraw.pendingHint')}
         >
           <SummaryList rows={[
-            ...(account ? [{ label: t('money.withdraw.destination'), value: `${bankName(account.bankCode)} •• ${account.clabeLastFour}` }] : []),
+            ...(account ? [{ label: t('money.withdraw.destination'), value: `${account.alias ?? bankName(account.bankCode)} •• ${account.clabeLastFour}` }] : []),
             { label: t('money.withdraw.walletBalance'), value: formatMoney(done.balance) },
             { label: t('common.date'), value: formatDateTime(done.createdAt) },
           ]} />
@@ -129,7 +135,7 @@ export function WithdrawDialog({ walletId: preferred, onClose }: { walletId?: st
             <ArrowLeft /> {t('common.edit')}
           </Button>
           <Button type="submit" size="lg" className="sm:flex-1" disabled={withdraw.isPending || !stepUp.ready}>
-            {withdraw.isPending && <Loader2 className="animate-spin" />} {t('money.withdraw.confirm')}
+            <ProcessingLabel pending={withdraw.isPending}>{t('money.withdraw.confirm')}</ProcessingLabel>
           </Button>
         </DialogFooter>
       </form>
@@ -178,7 +184,7 @@ export function WithdrawDialog({ walletId: preferred, onClose }: { walletId?: st
                   <Building2 className="size-4" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium">{bankName(a.bankCode)} •• {a.clabeLastFour}</span>
+                  <span className="block truncate text-sm font-medium">{a.alias ?? bankName(a.bankCode)} •• {a.clabeLastFour}</span>
                   <span className="block truncate text-xs text-muted-foreground">{a.holderName}</span>
                 </span>
                 {waiting && (

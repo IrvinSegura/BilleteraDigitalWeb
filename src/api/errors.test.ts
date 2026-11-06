@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { ApiError, errorMessage, hasCode, isPasswordRejected } from './errors'
+import { ApiError, errorMessage, hasCode, isPasswordRejected, moneyErrorMessage, RequestTimeoutError } from './errors'
 
 describe('ApiError', () => {
   it('carries the code, correlation id and validation messages by field', () => {
@@ -68,5 +68,17 @@ describe('errorMessage', () => {
   it('tells a network failure apart from an API error', () => {
     expect(errorMessage(new TypeError('Failed to fetch'))).toBe('No se pudo conectar con el servidor. Revisa tu conexión.')
     expect(errorMessage('boom')).toBe('Algo salió mal.')
+  })
+
+  it('says when the API took too long', () => {
+    expect(errorMessage(new RequestTimeoutError())).toBe('El servidor tardó demasiado en responder. Inténtalo de nuevo.')
+  })
+
+  it('warns that money may have moved only when no answer came', () => {
+    const unknown = /no sabemos si se completó/
+    expect(moneyErrorMessage(new RequestTimeoutError())).toMatch(unknown)
+    expect(moneyErrorMessage(new TypeError('Failed to fetch'))).toMatch(unknown)
+    expect(moneyErrorMessage(new ApiError(503, undefined))).not.toMatch(unknown)
+    expect(moneyErrorMessage(new ApiError(422, { code: 'INSUFFICIENT_FUNDS' }))).not.toMatch(unknown)
   })
 })

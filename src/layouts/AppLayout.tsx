@@ -20,7 +20,7 @@ import { useLiveNotifications } from '@/features/notifications/live'
 import { NotificationBell } from '@/features/notifications/NotificationBell'
 import { cn } from '@/lib/utils'
 
-import { adminNav, mainNav, mobileNav, type NavItem } from './nav'
+import { adminNav, mainNav, mobileNav, type NavItem, supportNav } from './nav'
 import { OfflineBanner } from './OfflineBanner'
 import { UserMenu } from './UserMenu'
 
@@ -66,6 +66,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <div className="grid gap-0.5">
           {mainNav.map((item) => <NavEntry key={item.to} item={item} unread={unread} onNavigate={onNavigate} />)}
         </div>
+        {user.role === 'SUPPORT' && (
+          <div className="grid gap-0.5">
+            <p className="px-3 pb-1.5 text-[0.7rem] font-semibold tracking-wider text-muted-foreground uppercase">{t('nav.supportTeam')}</p>
+            {supportNav.map((item) => <NavEntry key={item.to} item={item} unread={unread} onNavigate={onNavigate} />)}
+          </div>
+        )}
         {user.role === 'ADMIN' && (
           <div className="grid gap-0.5">
             <p className="px-3 pb-1.5 text-[0.7rem] font-semibold tracking-wider text-muted-foreground uppercase">{t('nav.administration')}</p>

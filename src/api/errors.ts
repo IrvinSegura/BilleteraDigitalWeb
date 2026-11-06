@@ -30,6 +30,14 @@ export class ApiError extends Error {
   }
 }
 
+/** The API didn't answer in time, so the call was given up on. */
+export class RequestTimeoutError extends Error {
+  constructor() {
+    super('The API took too long to answer')
+    this.name = 'RequestTimeoutError'
+  }
+}
+
 export function hasCode(error: unknown, code: string): boolean {
   return error instanceof ApiError && error.code === code
 }
@@ -61,6 +69,11 @@ const detailMessages: Record<string, (detail: string) => string> = {
     }),
   BANK_ACCOUNT_LIMIT_REACHED: (d) =>
     i18n.t('errors.details.bankAccountLimit', { max: grab(d, /at most (\d+)/)[0] ?? i18n.t('errors.details.some') }),
+  // The reason closes the detail ("... cannot be closed: BALANCE") and says what to do first
+  ACCOUNT_CANNOT_BE_CLOSED: (d) => {
+    const key = `errors.details.cannotClose.${grab(d, /: (\w+)$/)[0] ?? ''}`
+    return i18n.exists(key) ? i18n.t(key as MessageKey) : i18n.t('errors.codes.ACCOUNT_CANNOT_BE_CLOSED')
+  },
   BANK_ACCOUNT_COOLING_OFF: (d) => {
     const [from] = grab(d, /from (\S+)$/)
     return from && !Number.isNaN(new Date(from).getTime())
@@ -104,8 +117,21 @@ export function errorMessage(error: unknown): string {
     const statusKey = statusMessages[error.status]
     return known ?? (statusKey ? i18n.t(statusKey) : i18n.t('errors.generic'))
   }
+  if (error instanceof RequestTimeoutError) {
+    return i18n.t('errors.timeout')
+  }
   if (error instanceof TypeError) {
     return i18n.t('errors.network')
   }
   return i18n.t('errors.generic')
+}
+
+/** No answer came, so what was asked may or may not have happened: the API could have done it just before that. */
+export function outcomeUnknown(error: unknown): boolean {
+  return error instanceof RequestTimeoutError || error instanceof TypeError
+}
+
+/** Message for money that failed to move. Without an answer it can't say it didn't, and starting over could send it twice. */
+export function moneyErrorMessage(error: unknown): string {
+  return outcomeUnknown(error) ? i18n.t('errors.moneyOutcomeUnknown') : errorMessage(error)
 }

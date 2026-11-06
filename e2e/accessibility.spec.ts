@@ -42,8 +42,10 @@ test.describe('accessibility', () => {
     for (const [name, path, ready] of [
       ['dashboard', '/', 'Saldo disponible'],
       ['wallets', '/wallets', 'Billeteras'],
+      ['statements', '/statements', 'Por billetera'],
       ['notifications', '/notifications', 'Notificaciones'],
       ['settings', '/settings', 'Sesiones activas'],
+      ['support', '/support', 'Soporte'],
     ] as const) {
       test(`the ${name} has no violations`, async () => {
         await page.goto(path)

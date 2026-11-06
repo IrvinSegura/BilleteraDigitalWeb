@@ -26,6 +26,7 @@ import { labelOf } from '@/lib/labels'
 import { hasMarkup } from '@/lib/plain-text'
 import { message } from '@/lib/validation'
 
+import { AccountCard } from './AccountCard'
 import { EmailPreferencesCard } from './EmailPreferencesCard'
 import { SessionsCard } from './SessionsCard'
 import { TwoFactorCard } from './TwoFactorCard'
@@ -229,6 +230,7 @@ export function SettingsPage() {
         <div className="space-y-6">
           <ProfileCard />
           <EmailPreferencesCard />
+          <AccountCard />
         </div>
         <section id="security" className="scroll-mt-24 space-y-6">
           <TwoFactorCard />

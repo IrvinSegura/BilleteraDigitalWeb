@@ -25,7 +25,9 @@ export function RequestDialog({ walletId: preferred, onClose }: { walletId?: str
   const { t } = useTranslation()
   const user = useUser()
   const { data: wallets } = useWallets()
-  const [walletId, setWalletId] = useState(() => defaultWalletId(wallets, preferred))
+  // Until the user picks one: the wallets may still be loading when the dialog opens
+  const [pickedWallet, setWalletId] = useState('')
+  const walletId = pickedWallet || defaultWalletId(wallets, preferred)
   const [amount, setAmount] = useState('')
   const [concept, setConcept] = useState('')
 

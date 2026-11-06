@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
 import { api, unwrap } from '@/api/client'
-import { errorMessage, hasCode } from '@/api/errors'
+import { errorMessage, hasCode, moneyErrorMessage, outcomeUnknown } from '@/api/errors'
 import { useRecentRecipients, useWallets } from '@/api/queries'
 import { useUser } from '@/auth/auth-context'
 import { AmountInput } from '@/components/AmountInput'
@@ -20,7 +20,7 @@ import { hasMarkup, markupMessage } from '@/lib/plain-text'
 import { cn } from '@/lib/utils'
 
 import {
-  DailyLimitNote, defaultWalletId, Outcome, parseAmount, SummaryList, useAfterMoneyMoved, useDailyLimit,
+  DailyLimitNote, defaultWalletId, Outcome, parseAmount, ProcessingLabel, SummaryList, useAfterMoneyMoved, useDailyLimit,
   VerifyEmailNotice, WalletSelect,
 } from './shared'
 import { MAX_CONCEPT as MAX_DESCRIPTION, type PaymentRequest } from './payment-link'
@@ -65,7 +65,9 @@ export function TransferDialog({ walletId: preferred, prefill, onClose }: {
   const { data: wallets } = useWallets()
   // A request in another currency is paid from the wallet in that currency, when there is one
   const requested = wallets?.find((w) => w.balance?.currency === prefill?.currency)?.id
-  const [walletId, setWalletId] = useState(() => defaultWalletId(wallets, requested ?? preferred))
+  // Until the user picks one: the wallets may still be loading when the dialog opens
+  const [pickedWallet, setWalletId] = useState('')
+  const walletId = pickedWallet || defaultWalletId(wallets, requested ?? preferred)
   const [recipient, setRecipient] = useState(prefill?.to ?? '')
   const [amount, setAmount] = useState(prefill?.amount ?? '')
   const [description, setDescription] = useState(prefill?.concept ?? '')
@@ -78,7 +80,9 @@ export function TransferDialog({ walletId: preferred, prefill, onClose }: {
   const afterMoneyMoved = useAfterMoneyMoved()
 
   const wallet = wallets?.find((w) => w.id === walletId)
-  const currency = wallet?.balance?.currency ?? 'MXN'
+  const currency = wallet?.balance?.currency ?? prefill?.currency ?? 'MXN'
+  // The amount of a request means that currency: from a wallet in another one it would be a different sum of money
+  const wrongCurrency = !!prefill?.currency && !!wallet && currency !== prefill.currency
   const value = parseAmount(amount)
   const dailyLimit = useDailyLimit(walletId, value)
   const exceeds = (value !== null && value > amountOf(wallet?.balance)) || dailyLimit.over
@@ -117,11 +121,15 @@ export function TransferDialog({ walletId: preferred, prefill, onClose }: {
     })),
     onSuccess: afterMoneyMoved,
     // A refused attempt never claims the key, so the confirmed retry reuses it
-    onError: (error) => stepUp.handle(error),
+    onError: (error) => {
+      stepUp.handle(error)
+      // It may have gone through, and the balance on screen would be out of date
+      if (outcomeUnknown(error)) afterMoneyMoved()
+    },
   })
   const shownError = transfer.isError && !stepUpRequested(transfer.error)
     && !hasCode(transfer.error, 'INVALID_TWO_FACTOR_CODE') && !hasCode(transfer.error, 'INCORRECT_PASSWORD')
-    ? errorMessage(transfer.error) : null
+    ? moneyErrorMessage(transfer.error) : null
 
   if (!user.emailVerified) {
     return (
@@ -174,6 +182,7 @@ export function TransferDialog({ walletId: preferred, prefill, onClose }: {
           },
           { label: t('common.from'), value: t('common.walletOf', { currency }) },
           { label: t('common.concept'), value: description.trim() || '—' },
+          { label: t('common.fee'), value: t('common.noFee') },
           { label: t('common.balanceAfter'), value: formatMoney({ amount: String(amountOf(wallet?.balance) - value!), currency }) },
         ]} />
         <StepUpField stepUp={stepUp} error={transfer.error} />
@@ -184,7 +193,9 @@ export function TransferDialog({ walletId: preferred, prefill, onClose }: {
             <ArrowLeft /> {t('common.edit')}
           </Button>
           <Button type="submit" size="lg" className="sm:flex-1" disabled={transfer.isPending || !stepUp.ready}>
-            {transfer.isPending && <Loader2 className="animate-spin" />} {t(stepUp.method ? 'money.transfer.confirmAndSend' : 'money.transfer.sendNow')}
+            <ProcessingLabel pending={transfer.isPending}>
+              {t(stepUp.method ? 'money.transfer.confirmAndSend' : 'money.transfer.sendNow')}
+            </ProcessingLabel>
           </Button>
         </DialogFooter>
       </form>
@@ -198,7 +209,7 @@ export function TransferDialog({ walletId: preferred, prefill, onClose }: {
       onSubmit={(event) => {
         event.preventDefault()
         setTouched(true)
-        if (emailSchema.safeParse(recipientEmail).success && recipientEmail !== user.email.toLowerCase() && value && !exceeds && !descriptionError) {
+        if (emailSchema.safeParse(recipientEmail).success && recipientEmail !== user.email.toLowerCase() && value && !exceeds && !wrongCurrency && !descriptionError) {
           lookup.mutate()
         }
       }}
@@ -229,6 +240,9 @@ export function TransferDialog({ walletId: preferred, prefill, onClose }: {
           {t(exceeds && !dailyLimit.over ? 'money.overBalance' : 'common.available', { amount: formatMoney(wallet?.balance) })}
         </p>
         <DailyLimitNote {...dailyLimit} />
+        {wrongCurrency && (
+          <p className="text-xs text-destructive" role="alert">{t('money.transfer.wrongCurrency', { currency: prefill.currency })}</p>
+        )}
       </div>
       <FormField label={t('common.conceptOptional')} hint={`${description.length}/${MAX_DESCRIPTION}`} error={descriptionError}>
         {(field) => (
@@ -238,7 +252,7 @@ export function TransferDialog({ walletId: preferred, prefill, onClose }: {
       </FormField>
       <FormError message={lookup.isError && !notFound ? errorMessage(lookup.error) : null} />
       <DialogFooter>
-        <Button type="submit" size="lg" className="w-full" disabled={!walletId || value === null || exceeds || lookup.isPending}>
+        <Button type="submit" size="lg" className="w-full" disabled={!walletId || value === null || exceeds || wrongCurrency || lookup.isPending}>
           {lookup.isPending && <Loader2 className="animate-spin" />} {t('common.continue')}
         </Button>
       </DialogFooter>

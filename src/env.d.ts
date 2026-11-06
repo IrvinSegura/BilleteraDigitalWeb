@@ -7,6 +7,8 @@ interface ImportMetaEnv {
   readonly VITE_APP_VERSION?: string
   /** Cloudflare Turnstile site key for sign-up and password reset; empty when the API doesn't ask for a CAPTCHA. */
   readonly VITE_TURNSTILE_SITE_KEY?: string
+  /** Where people who can't sign in reach support, shown on the sign-in page; empty hides it. */
+  readonly VITE_SUPPORT_EMAIL?: string
 }
 
 interface ImportMeta {

@@ -148,6 +148,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["requestEmailChange"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me/email-verification": {
         parameters: {
             query?: never;
@@ -164,6 +180,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["closeAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/transfers": {
         parameters: {
             query?: never;
@@ -174,6 +206,134 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["transfer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/conversation/survey": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["survey"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/conversation/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/conversation/escalate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["escalate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/conversation/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["close"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/conversation/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["attach"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/conversations/{conversationId}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resolve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/conversations/{conversationId}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/conversations/{conversationId}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["attach_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -340,6 +500,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/email-change/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["confirmEmailChange"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/wallets/{walletId}/unfreeze": {
         parameters: {
             query?: never;
@@ -398,6 +574,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["resetTwoFactor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{userId}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["changeRole"];
         delete?: never;
         options?: never;
         head?: never;
@@ -493,7 +685,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["resolve"];
+        post: operations["resolve_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -530,6 +722,22 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["updateProfile"];
+        trace?: never;
+    };
+    "/api/v1/bank-accounts/{bankAccountId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["remove"];
+        options?: never;
+        head?: never;
+        patch: operations["rename"];
         trace?: never;
     };
     "/api/v1/wallets/{walletId}": {
@@ -692,6 +900,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["exportData"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/transfers/{transferId}": {
         parameters: {
             query?: never;
@@ -740,7 +964,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/notifications": {
+    "/api/v1/support/conversation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["current"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/attachments/{attachmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["attachment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["summary_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/conversations": {
         parameters: {
             query?: never;
             header?: never;
@@ -748,6 +1020,38 @@ export interface paths {
             cookie?: never;
         };
         get: operations["list_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/conversations/{conversationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_3"];
         put?: never;
         post?: never;
         delete?: never;
@@ -804,6 +1108,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/wallets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/wallets/{walletId}": {
         parameters: {
             query?: never;
@@ -811,7 +1131,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_4"];
+        get: operations["get_5"];
         put?: never;
         post?: never;
         delete?: never;
@@ -836,6 +1156,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/wallets/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_5"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/users/{userId}": {
         parameters: {
             query?: never;
@@ -843,7 +1195,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_5"];
+        get: operations["get_6"];
         put?: never;
         post?: never;
         delete?: never;
@@ -859,7 +1211,23 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_3"];
+        get: operations["list_6"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["stats_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -876,6 +1244,86 @@ export interface paths {
             cookie?: never;
         };
         get: operations["transfer_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/support/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["summary_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/support/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_7"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/support/conversations/{conversationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_7"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/support/bot/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["botSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/support/bot/misses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["botMisses"];
         put?: never;
         post?: never;
         delete?: never;
@@ -916,6 +1364,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/operations/totals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["totals"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/operations/suggestions": {
         parameters: {
             query?: never;
@@ -924,6 +1388,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["suggestions_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/operations/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["pending"];
         put?: never;
         post?: never;
         delete?: never;
@@ -996,7 +1476,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/bank-accounts/{bankAccountId}": {
+    "/api/v1/notifications/{notificationId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1006,7 +1486,23 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["remove"];
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteRead"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1145,6 +1641,16 @@ export interface components {
             /** Format: int64 */
             refreshExpiresIn?: number;
         };
+        ChangeEmailRequest: {
+            /** Format: email */
+            newEmail: string;
+            currentPassword: string;
+            twoFactorCode?: string;
+        };
+        CloseAccountRequest: {
+            currentPassword: string;
+            twoFactorCode?: string;
+        };
         TransferRequest: {
             /** Format: uuid */
             sourceWalletId: string;
@@ -1170,6 +1676,53 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
         };
+        SurveyRequest: {
+            /** Format: int32 */
+            score?: number;
+            comment?: string;
+        };
+        MessageRequest: {
+            text: string;
+        };
+        AttachmentResponse: {
+            /** Format: uuid */
+            id?: string;
+            fileName?: string;
+            contentType?: string;
+            /** Format: int64 */
+            sizeBytes?: number;
+        };
+        ConversationResponse: {
+            /** Format: uuid */
+            id?: string;
+            status?: string;
+            userName?: string;
+            agentName?: string;
+            /** Format: int64 */
+            queuePosition?: number;
+            awaitsSurvey?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            escalatedAt?: string;
+            /** Format: date-time */
+            assignedAt?: string;
+            /** Format: date-time */
+            resolvedAt?: string;
+            messages?: components["schemas"]["MessageResponse"][];
+        };
+        MessageResponse: {
+            /** Format: uuid */
+            id?: string;
+            sender?: string;
+            text?: string;
+            event?: string;
+            asksFeedback?: boolean;
+            suggestions?: string[];
+            attachment?: components["schemas"]["AttachmentResponse"];
+            /** Format: date-time */
+            createdAt?: string;
+        };
         AddBankAccountRequest: {
             clabe: string;
             holderName: string;
@@ -1181,6 +1734,7 @@ export interface components {
             bankCode?: string;
             clabeLastFour?: string;
             holderName?: string;
+            alias?: string;
             /** Format: date-time */
             createdAt?: string;
             /** Format: date-time */
@@ -1245,6 +1799,10 @@ export interface components {
         };
         TwoFactorResetResponse: {
             wasEnabled?: boolean;
+        };
+        RoleChangeRequest: {
+            role: string;
+            reason: string;
         };
         SuggestionsRequest: {
             text: string;
@@ -1331,6 +1889,9 @@ export interface components {
             fullName?: string;
             phone?: string;
         };
+        RenameBankAccountRequest: {
+            alias?: string;
+        };
         MonthSummaryResponse: {
             month?: string;
             openingBalance?: components["schemas"]["MoneyResponse"];
@@ -1356,6 +1917,8 @@ export interface components {
             balanceAfter?: components["schemas"]["MoneyResponse"];
             /** Format: date-time */
             createdAt?: string;
+            counterpartyName?: string;
+            description?: string;
         };
         WalletLimitsResponse: {
             dailyOutgoingLimit?: components["schemas"]["MoneyResponse"];
@@ -1398,6 +1961,34 @@ export interface components {
             lastSentAt?: string;
             /** Format: int64 */
             timesSent?: number;
+        };
+        AgentSummary: {
+            /** Format: uuid */
+            activeConversationId?: string;
+            /** Format: int64 */
+            queued?: number;
+        };
+        ConversationPageResponse: {
+            items?: components["schemas"]["ConversationSummaryResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            hasNext?: boolean;
+        };
+        ConversationSummaryResponse: {
+            /** Format: uuid */
+            id?: string;
+            status?: string;
+            userName?: string;
+            agentName?: string;
+            lastText?: string;
+            /** Format: date-time */
+            lastMessageAt?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            resolvedAt?: string;
         };
         NotificationPageResponse: {
             items?: components["schemas"]["NotificationResponse"][];
@@ -1453,6 +2044,52 @@ export interface components {
             /** Format: date-time */
             closedAt?: string;
         };
+        AdminWalletPageResponse: {
+            items?: components["schemas"]["AdminWalletResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            hasNext?: boolean;
+        };
+        WalletCounts: {
+            /** Format: int64 */
+            total?: number;
+            /** Format: int64 */
+            frozen?: number;
+        };
+        AdminUserPageResponse: {
+            items?: components["schemas"]["AdminUserSummary"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            hasNext?: boolean;
+        };
+        AdminUserSummary: {
+            /** Format: uuid */
+            id?: string;
+            email?: string;
+            fullName?: string;
+            role?: string;
+            status?: string;
+            emailVerified?: boolean;
+            locked?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        UserCounts: {
+            /** Format: int64 */
+            total?: number;
+            /** Format: int64 */
+            active?: number;
+            /** Format: int64 */
+            disabled?: number;
+            /** Format: int64 */
+            unverified?: number;
+            /** Format: int64 */
+            admins?: number;
+        };
         AdminTransferResponse: {
             /** Format: uuid */
             id?: string;
@@ -1472,6 +2109,65 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
         };
+        SupportCounts: {
+            /** Format: int64 */
+            withBot?: number;
+            /** Format: int64 */
+            queued?: number;
+            /** Format: int64 */
+            assigned?: number;
+            /** Format: int64 */
+            resolved?: number;
+            /** Format: int64 */
+            surveys?: number;
+            /** Format: double */
+            averageScore?: number;
+        };
+        AdminConversationResponse: {
+            conversation?: components["schemas"]["ConversationResponse"];
+            /** Format: int32 */
+            surveyScore?: number;
+            surveyComment?: string;
+        };
+        BotSummary: {
+            /** Format: int64 */
+            questions?: number;
+            /** Format: int64 */
+            answered?: number;
+            /** Format: int64 */
+            helped?: number;
+            /** Format: int64 */
+            notHelped?: number;
+            /** Format: int64 */
+            passedOn?: number;
+            /** Format: int64 */
+            suggested?: number;
+            /** Format: int64 */
+            askedAgain?: number;
+            /** Format: int64 */
+            notFound?: number;
+        };
+        BotMissPageResponse: {
+            items?: components["schemas"]["BotMissResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            hasNext?: boolean;
+        };
+        BotMissResponse: {
+            /** @enum {string} */
+            kind?: "NOT_HELPED" | "NOT_FOUND" | "SUGGESTED" | "ASKED_AGAIN";
+            language?: string;
+            question?: string;
+            topics?: string[];
+            /** Format: int64 */
+            times?: number;
+            /** Format: date-time */
+            lastAskedAt?: string;
+            /** Format: uuid */
+            conversationId?: string;
+        };
         BalanceComparisonResponse: {
             currency?: string;
             /** Format: int64 */
@@ -1488,10 +2184,28 @@ export interface components {
             holdsFunds?: boolean;
             comparisons?: components["schemas"]["BalanceComparisonResponse"][];
         };
+        OperationTotalResponse: {
+            kind?: string;
+            /** Format: int64 */
+            count?: number;
+            amount?: components["schemas"]["MoneyResponse"];
+        };
         OperationSuggestionResponse: {
             kind?: string;
             /** Format: uuid */
             id?: string;
+            amount?: components["schemas"]["MoneyResponse"];
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        PendingOperationResponse: {
+            kind?: string;
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            userId?: string;
+            /** Format: uuid */
+            walletId?: string;
             amount?: components["schemas"]["MoneyResponse"];
             /** Format: date-time */
             createdAt?: string;
@@ -1539,6 +2253,10 @@ export interface components {
         RevokedSessionsResponse: {
             /** Format: int32 */
             revoked?: number;
+        };
+        DeletedResponse: {
+            /** Format: int32 */
+            deleted?: number;
         };
         ProblemDetail: {
             /** Format: uri */
@@ -1844,6 +2562,30 @@ export interface operations {
             };
         };
     };
+    requestEmailChange: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Accept-Language"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     resendVerification: {
         parameters: {
             query?: never;
@@ -1852,6 +2594,28 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    closeAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloseAccountRequest"];
+            };
+        };
         responses: {
             /** @description OK */
             200: {
@@ -1884,6 +2648,200 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["TransferResponse"];
+                };
+            };
+        };
+    };
+    survey: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SurveyRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MessageRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationResponse"];
+                };
+            };
+        };
+    };
+    escalate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationResponse"];
+                };
+            };
+        };
+    };
+    close: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationResponse"];
+                };
+            };
+        };
+    };
+    attach: {
+        parameters: {
+            query?: {
+                text?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationResponse"];
+                };
+            };
+        };
+    };
+    resolve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationResponse"];
+                };
+            };
+        };
+    };
+    reply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MessageRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationResponse"];
+                };
+            };
+        };
+    };
+    attach_1: {
+        parameters: {
+            query?: {
+                text?: string;
+            };
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationResponse"];
                 };
             };
         };
@@ -2134,6 +3092,28 @@ export interface operations {
             };
         };
     };
+    confirmEmailChange: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TokenRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     unfreeze: {
         parameters: {
             query?: never;
@@ -2234,6 +3214,32 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["TwoFactorResetResponse"];
+                };
+            };
+        };
+    };
+    changeRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoleChangeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminUserResponse"];
                 };
             };
         };
@@ -2380,7 +3386,7 @@ export interface operations {
             };
         };
     };
-    resolve: {
+    resolve_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2471,6 +3477,52 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["UserResponse"];
+                };
+            };
+        };
+    };
+    remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                bankAccountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    rename: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                bankAccountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenameBankAccountRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BankAccountResponse"];
                 };
             };
         };
@@ -2731,6 +3783,28 @@ export interface operations {
             };
         };
     };
+    exportData: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     get_3: {
         parameters: {
             query?: never;
@@ -2798,7 +3872,114 @@ export interface operations {
             };
         };
     };
+    current: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationResponse"];
+                };
+            };
+        };
+    };
+    attachment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attachmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    summary_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AgentSummary"];
+                };
+            };
+        };
+    };
     list_2: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationPageResponse"];
+                };
+            };
+        };
+    };
+    get_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationResponse"];
+                };
+            };
+        };
+    };
+    list_3: {
         parameters: {
             query?: {
                 unreadOnly?: boolean;
@@ -2884,7 +4065,31 @@ export interface operations {
             };
         };
     };
-    get_4: {
+    list_4: {
+        parameters: {
+            query?: {
+                status?: string;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminWalletPageResponse"];
+                };
+            };
+        };
+    };
+    get_5: {
         parameters: {
             query?: never;
             header?: never;
@@ -2928,7 +4133,52 @@ export interface operations {
             };
         };
     };
-    get_5: {
+    stats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WalletCounts"];
+                };
+            };
+        };
+    };
+    list_5: {
+        parameters: {
+            query?: {
+                status?: string;
+                role?: string;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminUserPageResponse"];
+                };
+            };
+        };
+    };
+    get_6: {
         parameters: {
             query?: never;
             header?: never;
@@ -2950,7 +4200,7 @@ export interface operations {
             };
         };
     };
-    list_3: {
+    list_6: {
         parameters: {
             query?: never;
             header?: never;
@@ -2968,6 +4218,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AdminWalletResponse"][];
+                };
+            };
+        };
+    };
+    stats_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserCounts"];
                 };
             };
         };
@@ -2990,6 +4260,120 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AdminTransferResponse"];
+                };
+            };
+        };
+    };
+    summary_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SupportCounts"];
+                };
+            };
+        };
+    };
+    list_7: {
+        parameters: {
+            query?: {
+                status?: "BOT" | "QUEUED" | "ASSIGNED" | "RESOLVED";
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationPageResponse"];
+                };
+            };
+        };
+    };
+    get_7: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminConversationResponse"];
+                };
+            };
+        };
+    };
+    botSummary: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BotSummary"];
+                };
+            };
+        };
+    };
+    botMisses: {
+        parameters: {
+            query?: {
+                kind?: "NOT_HELPED" | "NOT_FOUND" | "SUGGESTED" | "ASKED_AGAIN";
+                language?: string;
+                days?: number;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BotMissPageResponse"];
                 };
             };
         };
@@ -3037,6 +4421,28 @@ export interface operations {
             };
         };
     };
+    totals: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OperationTotalResponse"][];
+                };
+            };
+        };
+    };
     suggestions_2: {
         parameters: {
             query: {
@@ -3056,6 +4462,29 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["OperationSuggestionResponse"][];
+                };
+            };
+        };
+    };
+    pending: {
+        parameters: {
+            query?: {
+                kind?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PendingOperationResponse"][];
                 };
             };
         };
@@ -3150,13 +4579,31 @@ export interface operations {
             };
         };
     };
-    remove: {
+    delete: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                bankAccountId: string;
+                notificationId: string;
             };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -3166,7 +4613,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "*/*": components["schemas"]["DeletedResponse"];
+                };
             };
         };
     };

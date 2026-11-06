@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CircleCheck, Clock, MailWarning, type LucideIcon, XCircle } from 'lucide-react'
+import { CircleCheck, Clock, Loader2, MailWarning, type LucideIcon, XCircle } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -22,6 +22,12 @@ export function useAfterMoneyMoved() {
     void queryClient.invalidateQueries({ queryKey: ['notifications'] })
     void queryClient.invalidateQueries({ queryKey: ['transfers'] })
   }
+}
+
+/** What the button that moves money says: what it does, or that it is doing it. */
+export function ProcessingLabel({ pending, children }: { pending: boolean; children: ReactNode }) {
+  const { t } = useTranslation()
+  return pending ? <><Loader2 className="animate-spin" /> {t('common.processing')}</> : children
 }
 
 export function WalletSelect({ id, value, onValueChange, filter }: {

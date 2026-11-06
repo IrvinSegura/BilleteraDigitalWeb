@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { Loader2, ShieldAlert } from 'lucide-react'
 import { type ReactNode, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { toast } from 'sonner'
 
 import { api, unwrap } from '@/api/client'
@@ -11,13 +11,21 @@ import { useAuth } from '@/auth/auth-context'
 import { CopyButton } from '@/components/CopyButton'
 import { ErrorState, FormError } from '@/components/ErrorState'
 import { FormField } from '@/components/FormField'
+import { Skeleton } from '@/components/Skeleton'
 import { StatusBadge } from '@/components/StatusBadge'
 import { useSuggestions } from '@/components/SuggestInput'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { shortId } from '@/lib/format'
+import { formatCount, shortId } from '@/lib/format'
 import { userStatus } from '@/lib/labels'
+import { cn } from '@/lib/utils'
+
+const statTones = {
+  danger: 'text-destructive',
+  warning: 'text-warning-foreground dark:text-warning',
+  info: 'text-sky-600 dark:text-sky-400',
+}
 
 /**
  * The users that match what is being typed, by email, name or the start of their id. A POST like the search, so the
@@ -147,6 +155,57 @@ export function ReasonAction({ trigger, title, description, confirmLabel, destru
       </DialogContent>
     </Dialog>
   )
+}
+
+/**
+ * The counts at the top of a list, as a row of tiles. While they load, or if they can't be read, the tile shows a
+ * placeholder: the list below is what matters, and it reports any failure itself.
+ */
+export function AdminStats({ label, loading, tiles }: {
+  label: string
+  loading: boolean
+  tiles: { label: string; value: number | undefined; tone?: 'danger' | 'warning' | 'info' }[]
+}) {
+  return (
+    <dl aria-label={label} className="grid grid-cols-2 gap-3 md:grid-cols-[repeat(auto-fit,minmax(9rem,1fr))]">
+      {tiles.map((tile) => (
+        <div key={tile.label} className="rounded-2xl border bg-card p-4">
+          <dt className="truncate text-xs text-muted-foreground">{tile.label}</dt>
+          <dd className={cn('mt-1 text-2xl font-semibold tracking-tight tabular', !!tile.value && tile.tone && statTones[tile.tone])}>
+            {loading ? <Skeleton className="mt-1 h-7 w-14" /> : tile.value === undefined ? '—' : formatCount(tile.value)}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
+
+/**
+ * A list's filters and page, kept in the address so coming back from a record finds the list as it was and a link
+ * shows the same thing. A value outside `allowed` counts as no filter, since the API would refuse it.
+ */
+export function useListParams<K extends string>(allowed: Record<K, readonly string[]>) {
+  const [params, setParams] = useSearchParams()
+  const filters = Object.fromEntries((Object.keys(allowed) as K[]).map((key) => {
+    const value = params.get(key) ?? ''
+    return [key, allowed[key].includes(value) ? value : '']
+  })) as Record<K, string>
+  const page = Math.max(0, Number.parseInt(params.get('page') ?? '', 10) || 0)
+  const write = (nextFilters: Record<K, string>, nextPage: number) => setParams(() => {
+    const next = new URLSearchParams()
+    for (const key of Object.keys(nextFilters) as K[]) {
+      if (nextFilters[key]) next.set(key, nextFilters[key])
+    }
+    if (nextPage > 0) next.set('page', String(nextPage))
+    return next
+  })
+  return {
+    filters,
+    page,
+    // Another filter means other rows: back to the first page
+    setFilter: (key: K, value: string) => write({ ...filters, [key]: value }, 0),
+    setPage: (next: number) => write(filters, next),
+  }
 }
 
 export function DetailGrid({ rows }: { rows: { label: string; value: ReactNode }[] }) {

@@ -31,6 +31,9 @@ export function MovementRow({ movement, onOpen }: { movement: Movement; onOpen: 
   const { t } = useTranslation()
   const Icon = movementIcon(movement.type, movement.direction)
   const incoming = movement.direction === 'IN'
+  const label = movementLabel(movement.type, movement.direction)
+  // A transfer reads by who it was with; deposits and withdrawals have no one else, so their kind stays the title
+  const details = [movement.counterpartyName ? label : null, movement.description, formatRelative(movement.createdAt)]
   return (
     <button
       type="button"
@@ -41,9 +44,10 @@ export function MovementRow({ movement, onOpen }: { movement: Movement; onOpen: 
         incoming ? 'bg-success/12 text-success' : 'bg-muted text-muted-foreground')}>
         <Icon className="size-[1.1rem]" />
       </span>
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-medium">{movementLabel(movement.type, movement.direction)}</span>
-        <span className="block truncate text-xs text-muted-foreground">{formatRelative(movement.createdAt)}</span>
+      {/* No width of its own: a long concept is cut here, instead of widening the whole page on a phone */}
+      <span className="w-0 min-w-0 flex-1">
+        <span className="block truncate text-sm font-medium">{movement.counterpartyName ?? label}</span>
+        <span className="block truncate text-xs text-muted-foreground">{details.filter(Boolean).join(' · ')}</span>
       </span>
       <span className="text-right">
         <MovementAmount movement={movement} className="block text-sm" />

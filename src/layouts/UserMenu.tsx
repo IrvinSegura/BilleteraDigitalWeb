@@ -58,9 +58,9 @@ export function UserMenu({ variant }: { variant: 'sidebar' | 'compact' }) {
           <DropdownMenuLabel className="px-2 py-2">
             <span className="block truncate text-sm font-medium text-foreground">{user.fullName}</span>
             <span className="block truncate text-xs font-normal text-muted-foreground">{user.email}</span>
-            {user.role === 'ADMIN' && (
+            {user.role !== 'USER' && (
               <span className="mt-1.5 inline-flex rounded-full bg-accent px-2 py-0.5 text-[0.7rem] font-medium text-accent-foreground">
-                {t('labels.roles.ADMIN')}
+                {t(`labels.roles.${user.role}`)}
               </span>
             )}
           </DropdownMenuLabel>

@@ -24,6 +24,38 @@ const TYPES_OF_KIND: Record<string, string[]> = {
 
 // The API's limit for one statement file
 const MAX_STATEMENT_DAYS = 366
+// The API's limit for the search text
+const MAX_SEARCH_LENGTH = 60
+// A picked suggestion leaves a whole folio in the field, which has nothing left to suggest
+const WHOLE_FOLIO = /^[0-9a-f-]{36}$/i
+
+const CALENDAR_DAY = /^\d{4}-\d{2}-\d{2}$/
+const KNOWN_TYPES = Object.values(TYPES_OF_KIND).flat()
+
+/** The filters a link holds; anything else in it, typed or left by an older link, is ignored. */
+export function filtersFrom(params: URLSearchParams): MovementFilters {
+  const day = (name: string) => (CALENDAR_DAY.test(params.get(name) ?? '') ? params.get(name)! : undefined)
+  const types = params.getAll('type').filter((type) => KNOWN_TYPES.includes(type))
+  const direction = params.get('direction')
+  return {
+    ...(day('from') && { from: day('from') }),
+    ...(day('to') && { to: day('to') }),
+    ...(types.length > 0 && { type: types }),
+    ...((direction === 'IN' || direction === 'OUT') && { direction }),
+    ...(params.get('q')?.trim() && { q: params.get('q')!.trim().slice(0, MAX_SEARCH_LENGTH) }),
+  }
+}
+
+/** The filters as the query of the page, so they survive going to a receipt and back, and can be shared. */
+export function filtersToParams(filters: MovementFilters): URLSearchParams {
+  const params = new URLSearchParams()
+  if (filters.from) params.set('from', filters.from)
+  if (filters.to) params.set('to', filters.to)
+  filters.type?.forEach((type) => params.append('type', type))
+  if (filters.direction) params.set('direction', filters.direction)
+  if (filters.q) params.set('q', filters.q)
+  return params
+}
 
 /** Today as a calendar date in the browser's zone, `yyyy-MM-dd`. */
 export function today(): string {
@@ -73,7 +105,7 @@ export function MovementFilterBar({ walletId, filters, onChange }: {
   const [downloading, setDownloading] = useState(false)
   const invalidPeriod = !!filters.from && !!filters.to && filters.from > filters.to
 
-  // The folio search waits for a pause in typing, so each keystroke doesn't fetch a page
+  // The search waits for a pause in typing, so each keystroke doesn't fetch a page
   useEffect(() => {
     const q = search.trim() || undefined
     if (q === filters.q) return
@@ -102,15 +134,15 @@ export function MovementFilterBar({ walletId, filters, onChange }: {
     }
   }
 
-  const folio = useSuggestions(['folio', walletId], search.length < 36 ? search : '', async (q, signal) => {
+  const matches = useSuggestions(['movements', walletId], WHOLE_FOLIO.test(search.trim()) ? '' : search, async (q, signal) => {
     const page = await unwrap(api.GET('/api/v1/wallets/{walletId}/movements', {
       params: { path: { walletId }, query: { q, size: MAX_SUGGESTIONS } },
       signal,
     }))
     return (page.items ?? []).filter((m) => m.operationId).map((m) => ({
       value: m.operationId!,
-      title: m.operationId!,
-      detail: `${movementLabel(m.type, m.direction)} · ${formatDateTime(m.createdAt)}`,
+      title: m.counterpartyName ?? m.operationId!,
+      detail: [movementLabel(m.type, m.direction), m.description, formatDateTime(m.createdAt)].filter(Boolean).join(' · '),
       aside: `${m.direction === 'IN' ? '+' : '−'}${formatMoney(m.amount)}`,
     }))
   }, 2)
@@ -158,13 +190,12 @@ export function MovementFilterBar({ walletId, filters, onChange }: {
                 onChange={(event) => onChange({ ...filters, to: event.target.value || undefined })} />
             </label>
             <label className="grid gap-1 text-xs text-muted-foreground">
-              {t('common.folio')}
+              {t('common.search')}
               <span className="relative">
                 <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-                <SuggestInput inputClassName="pl-8 font-mono" placeholder={t('wallets.filters.folioPlaceholder')} value={search} maxLength={36}
-                  // A folio is an operation id: hex digits and dashes
-                  onValueChange={(next) => setSearch(next.replace(/[^0-9a-f-]/gi, ''))}
-                  suggestions={folio.suggestions} loading={folio.loading} noMatches={folio.settled} />
+                <SuggestInput inputClassName="pl-8" placeholder={t('wallets.filters.searchPlaceholder')} value={search}
+                  maxLength={MAX_SEARCH_LENGTH} onValueChange={setSearch}
+                  suggestions={matches.suggestions} loading={matches.loading} noMatches={matches.settled} />
               </span>
             </label>
           </div>

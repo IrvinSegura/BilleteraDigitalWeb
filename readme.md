@@ -18,18 +18,22 @@ refresh cookie works.
 
 | Path | What it does |
 | --- | --- |
-| `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email` | Sign-in with two-factor step, sign-up, password reset and email links |
+| `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email`, `/confirm-email-change` | Sign-in with two-factor step, sign-up, password reset and email links (confirming a new address signs out every session) |
 | `/` | Balance card, money in/out this month (summed by the API), balance chart over 7, 30 or 90 days, recent activity, account checklist |
-| `/wallets`, `/wallets/:id` | One wallet per currency (MXN, USD), movements filtered by dates, type, direction and folio, CSV export |
-| `/wallets/:id/statement` | A month's statement (opening and closing balance, every movement), to print or save as PDF |
+| `/wallets`, `/wallets/:id` | One wallet per currency (MXN, USD), movements with the other person and the concept, filtered by dates, type, direction and text (person, concept or folio), CSV export |
+| `/wallets/:id/statement` | A month's statement (opening and closing balance, every movement), to print or download as a PDF file |
+| `/statements` | Every statement in one place: each wallet's month at a glance, its PDF, and a general PDF covering all wallets. PDFs are built in the browser with jsPDF (loaded only when one is downloaded): table header on every page, folio and page numbers |
 | `/wallets/:id/receipts/:transactionId` | One movement's receipt: print or PDF, or shared as a PNG image (share sheet or download) |
 | Deposit / Send / Withdraw dialogs | Opened from anywhere; each money movement carries its own `Idempotency-Key`. Sending offers recent recipients and names who the email belongs to before confirming; sending and withdrawing show what the daily limit still allows |
 | Request ("Cobrar") dialog, `/send` | A payment link and QR code (`/send?to=&amount=&currency=&concept=`) that opens the payer's send dialog filled in for review; nothing is stored |
-| `/bank-accounts` | CLABE accounts for SPEI withdrawals (check digit validated, 24 h cooling-off shown) |
-| `/notifications` | Notices with unread filter; new ones arrive live (see below) |
-| `/settings` | Name and phone, email verification, which notices also arrive by email, active sessions (end one or all the others), password change, authenticator app (QR + recovery codes) |
-| `/admin/*` | Users, operations lookup, reconciliations, ledger, payment provider, audit log (admins with two-factor on) |
-| Search fields | Users, operations, audit log and folio preview up to 6 matches as you type (`SuggestInput`); the recipient field only looks among people already paid, so it can't reveal who has an account |
+| `/bank-accounts` | CLABE accounts for SPEI withdrawals (check digit validated, 24 h cooling-off shown), each with an optional name of the owner's |
+| `/notifications` | Notices with unread filter; new ones arrive live (see below). Delete one, or every read one |
+| `/settings` | Name and phone, email verification, which notices also arrive by email, active sessions (end one or all the others), password change, authenticator app (QR + recovery codes), change of email (link to the new address), a JSON copy of the account's data, and closing the account (only with no balance and nothing pending) |
+| `/support` | Chat with support: a bot that answers from the API's Markdown files, then a person. Files (JPG, PNG, WebP, PDF, MP4 up to 20 MB), and a survey when an agent attended it. While it is with a person the chat is read again every 3 s |
+| `/support/inbox`, `/support/inbox/:id` | Support agents (`SUPPORT` role): their cases, the people waiting, and each case with everything said to the bot. Its notification opens the case |
+| `/admin/*` | Users (including making someone a support agent) and wallets (counts and lists filtered by state, kept in the address), operations (the last 7 days' totals, what is still pending, and lookup by id), reconciliations, ledger, payment provider, support (how it is doing, and each case with its survey), audit log (admins with two-factor on) |
+| Any other address | A not-found page with the way home |
+| Search fields | Users, operations, audit log and movements preview up to 6 matches as you type (`SuggestInput`); the recipient field only looks among people already paid, so it can't reveal who has an account |
 
 Code lives by feature in `src/features/*`; shared pieces are in `src/components`, `src/lib` and `src/api`.
 
@@ -107,6 +111,8 @@ changes, so emails go out in that language.
 - `e2e/admin.spec.ts` makes its administrator by setting the role in the database (the API has no endpoint for it),
   with `docker exec` on the backend's PostgreSQL container: `E2E_DB_CONTAINER` (default
   `billeterra-digital-postgres-1`), `E2E_DB_NAME` (`wallet`) and `E2E_DB_USER` (`wallet_owner`) point it elsewhere.
+- `e2e/support.spec.ts` makes its agent the same way, and needs a database with no other agent, since any free agent
+  can get its case.
 - Unit tests share helpers in `src/test`: `stubApi()` (a fake API behind `fetch`; import the code under test after
   it), the `auth` mock with `testUser()`, `renderWithProviders`/`renderDialog` and common fixtures.
 - `e2e/offline.spec.ts` needs the service worker, which only the build has: run it with `npm run build`, then
@@ -119,4 +125,6 @@ changes, so emails go out in that language.
 Serve the app from the API's own site (same origin, or the same reverse proxy) and leave `VITE_API_URL` empty.
 If the API is on another origin, it must be on the same site (e.g. `app.example.com` and `api.example.com`): set
 `VITE_API_URL` to it and add this app's origin to the API's `CORS_ALLOWED_ORIGINS`. Set the API's
-`wallet.notifications.email.app-url` and `wallet.payments.return-url` to this app's address.
+`wallet.notifications.email.app-url` and `wallet.payments.return-url` to this app's address. Set
+`VITE_SUPPORT_EMAIL` to the inbox that answers people who can't sign in: the support chat needs a session, so the
+sign-in page shows this address to them, and hides it when empty.

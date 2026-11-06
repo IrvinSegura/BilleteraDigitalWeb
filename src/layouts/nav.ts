@@ -4,8 +4,12 @@ import {
   Building2,
   CreditCard,
   FileSearch,
+  FileText,
+  Headset,
   House,
+  Inbox,
   Landmark,
+  LifeBuoy,
   type LucideIcon,
   ScrollText,
   Scale,
@@ -28,17 +32,26 @@ export interface NavItem {
 export const mainNav: NavItem[] = [
   { to: '/', labelKey: 'nav.home', icon: House, end: true },
   { to: '/wallets', labelKey: 'nav.wallets', icon: Wallet },
+  { to: '/statements', labelKey: 'nav.statements', icon: FileText },
   { to: '/bank-accounts', labelKey: 'nav.bankAccounts', icon: Building2 },
   { to: '/notifications', labelKey: 'nav.notifications', icon: Bell, badge: 'unread' },
   { to: '/settings', labelKey: 'nav.account', icon: Settings },
+  // Exact, because the agents' inbox lives under it and has its own link
+  { to: '/support', labelKey: 'nav.support', icon: LifeBuoy, end: true },
+]
+
+export const supportNav: NavItem[] = [
+  { to: '/support/inbox', labelKey: 'nav.inbox', icon: Inbox },
 ]
 
 export const adminNav: NavItem[] = [
   { to: '/admin/users', labelKey: 'nav.users', icon: Users },
+  { to: '/admin/wallets', labelKey: 'nav.wallets', icon: Wallet },
   { to: '/admin/operations', labelKey: 'nav.operations', icon: FileSearch },
   { to: '/admin/reconciliations', labelKey: 'nav.reconciliations', icon: Scale },
   { to: '/admin/ledger', labelKey: 'nav.ledger', icon: Landmark },
   { to: '/admin/payments', labelKey: 'nav.payments', icon: CreditCard },
+  { to: '/admin/support', labelKey: 'nav.support', icon: Headset },
   { to: '/admin/audit', labelKey: 'nav.audit', icon: ScrollText },
 ]
 
