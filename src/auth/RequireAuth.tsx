@@ -69,6 +69,14 @@ export function RequireAdmin() {
   return <Outlet />
 }
 
+export function RequireSupport() {
+  const { state } = useAuth()
+  if (state.status === 'signed-in' && state.user.role !== 'SUPPORT') {
+    return <Navigate to="/" replace />
+  }
+  return <Outlet />
+}
+
 /** Sign-in screens; a signed-in user goes straight to the app. */
 export function GuestOnly() {
   const { state } = useAuth()

@@ -1,6 +1,6 @@
 import { createContext, use } from 'react'
 
-export type Role = 'USER' | 'ADMIN'
+export type Role = 'USER' | 'SUPPORT' | 'ADMIN'
 
 export interface User {
   id: string
