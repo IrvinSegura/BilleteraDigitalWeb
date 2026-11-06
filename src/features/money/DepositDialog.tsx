@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -15,7 +14,7 @@ import { formatMoney, newIdempotencyKey } from '@/lib/format'
 
 import { isTrustedCheckoutUrl, UntrustedCheckoutError } from './checkout-url'
 import { rememberPendingDeposit } from './pending-deposits'
-import { defaultWalletId, Outcome, parseAmount, QuickAmounts, SummaryList, useAfterMoneyMoved, WalletSelect } from './shared'
+import { defaultWalletId, Outcome, parseAmount, ProcessingLabel, QuickAmounts, SummaryList, useAfterMoneyMoved, WalletSelect } from './shared'
 
 // The API's transfers.max-deposit; it enforces it, this only warns before sending
 const MAX_DEPOSIT: Record<string, number> = { MXN: 100_000, USD: 5_000 }
@@ -23,7 +22,9 @@ const MAX_DEPOSIT: Record<string, number> = { MXN: 100_000, USD: 5_000 }
 export function DepositDialog({ walletId: preferred, onClose }: { walletId?: string; onClose: () => void }) {
   const { t } = useTranslation()
   const { data: wallets } = useWallets()
-  const [walletId, setWalletId] = useState(() => defaultWalletId(wallets, preferred))
+  // Until the user picks one: the wallets may still be loading when the dialog opens
+  const [pickedWallet, setWalletId] = useState('')
+  const walletId = pickedWallet || defaultWalletId(wallets, preferred)
   const [amount, setAmount] = useState('')
   // One key per deposit attempt: a retry after a timeout replays it instead of charging twice
   const [key] = useState(newIdempotencyKey)
@@ -121,7 +122,7 @@ export function DepositDialog({ walletId: preferred, onClose }: { walletId?: str
         : deposit.error instanceof UntrustedCheckoutError ? t('money.deposit.untrustedCheckout') : errorMessage(deposit.error)} />
       <DialogFooter>
         <Button type="submit" size="lg" className="w-full" disabled={!walletId || value === null || tooLarge || deposit.isPending}>
-          {deposit.isPending && <Loader2 className="animate-spin" />} {t('money.deposit.submit')}
+          <ProcessingLabel pending={deposit.isPending}>{t('money.deposit.submit')}</ProcessingLabel>
         </Button>
       </DialogFooter>
     </form>
