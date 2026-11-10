@@ -11,6 +11,8 @@ export interface User {
   role: Role
   emailVerified: boolean
   twoFactorEnabled: boolean
+  /** The account still has the password it was emailed: it can do nothing else until it replaces it */
+  mustChangePassword: boolean
   /** The language of the user's emails, kept in step with the one the app shows */
   language?: string
   createdAt: string | undefined

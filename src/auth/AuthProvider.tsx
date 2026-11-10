@@ -19,6 +19,7 @@ function toUser(me: Schemas['UserResponse']): User {
     role: me.role as Role,
     emailVerified: me.emailVerified!,
     twoFactorEnabled: me.twoFactorEnabled!,
+    mustChangePassword: me.mustChangePassword ?? false,
     language: me.language,
     createdAt: me.createdAt,
   }
