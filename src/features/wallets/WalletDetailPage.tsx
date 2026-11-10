@@ -59,7 +59,7 @@ export function WalletDetailPage() {
               title={t('wallets.chart.label')} />
             <Card className="gap-0 pb-0">
               <CardHeader className="border-b pb-4"><CardTitle>{t('common.movements')}</CardTitle></CardHeader>
-              <MovementFilterBar walletId={walletId} filters={filters} onChange={changeFilters} />
+              <MovementFilterBar walletId={walletId} openedAt={wallet.data?.createdAt} filters={filters} onChange={changeFilters} />
               {invalidPeriod ? null : movements.isPending ? <ListSkeleton rows={6} /> : movements.isError ? (
                 <ErrorState error={movements.error} onRetry={() => movements.refetch()} />
               ) : items.length === 0 && countActive(filters) > 0 ? (

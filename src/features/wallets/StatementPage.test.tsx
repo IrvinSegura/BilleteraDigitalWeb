@@ -89,7 +89,7 @@ describe('StatementPage PDF download', () => {
     await waitFor(() => expect(pdf.save).toHaveBeenCalledWith(expect.any(Blob), 'statement.pdf'))
     expect(pdf.build.mock.calls[0]![0]).toMatchObject({
       general: false,
-      month: '2026-11',
+      period: { from: '2026-11-01', to: '2026-11-30' },
       holder: { fullName: 'Ana López' },
       wallets: [{ walletId: 'wallet-mxn', currency: 'MXN', closingBalance: money('1100.00'), cut: false, movements: [{ transactionId: 't-1' }] }],
     })
