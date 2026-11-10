@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // openapi-fetch takes globalThis.fetch when the client is created, so the stub must exist before the import
@@ -48,9 +49,9 @@ const listRequests = () => fetchMock.mock.calls
   .map(([input]) => new URL((input as Request).url))
   .filter((url) => url.pathname.endsWith('/provider-transactions'))
 
-function renderPage() {
+function renderPage(route = '/admin/payments') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  return render(<QueryClientProvider client={client}><AdminPaymentsPage /></QueryClientProvider>)
+  return render(<QueryClientProvider client={client}><MemoryRouter initialEntries={[route]}><AdminPaymentsPage /></MemoryRouter></QueryClientProvider>)
 }
 
 describe('AdminPaymentsPage', () => {
@@ -60,6 +61,12 @@ describe('AdminPaymentsPage', () => {
     balance = { provider: 'STRIPE', holdsFunds: true, comparisons: [] }
     transactions = [unmatched, posted]
     serve()
+  })
+
+  it('opens on the unmatched ones when the home links there', async () => {
+    renderPage('/admin/payments?status=UNMATCHED')
+
+    await waitFor(() => expect(listRequests()[0]?.searchParams.get('status')).toBe('UNMATCHED'))
   })
 
   it('asks for every status by default and says so', async () => {

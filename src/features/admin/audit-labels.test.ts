@@ -31,6 +31,16 @@ describe('auditDetails', () => {
     ['TRANSFER_COMPLETED', `transfer ${A}: 10.00 MXN to wallet ${B}`, 'a la billetera '],
     ['PROFILE_UPDATED', 'FULL_NAME, PHONE', 'Cambió: nombre, teléfono'],
     ['PROVIDER_TRANSACTION_RESOLVED', 'STRIPE txn_1, reason: Ajuste acordado', 'Movimiento txn_1. Motivo: Ajuste acordado'],
+    ['IDENTITY_VERIFICATION_SUBMITTED', 'document INE', 'Documento: INE'],
+    ['IDENTITY_VERIFIED', 'approved', 'Aprobada'],
+    ['IDENTITY_REJECTED', 'reason: Foto borrosa', 'Motivo: Foto borrosa'],
+    ['STAFF_ACCOUNT_CREATED', 'role: SUPPORT, reason: Nuevo ingreso', 'Nuevo rol: Soporte. Motivo: Nuevo ingreso'],
+    ['SUPPORT_TICKET_OPENED', `ticket ${A}: withdrawal ${B}`, 'Retiro '],
+    ['SUPPORT_TICKET_RESOLVED', `ticket ${A}, resolution: Devolvimos el retiro`, '. Resolución: Devolvimos el retiro'],
+    ['SUPPORT_TICKET_OPENED', `ticket ${A}: account_access`, ': Acceso a la cuenta'],
+    ['ADJUSTMENT_REQUESTED', `adjustment ${A}: credit 250.00 MXN, reason: No llegó`, ': abono de $250.00. Motivo: No llegó'],
+    ['ADJUSTMENT_APPLIED', `adjustment ${A}: debit 10.00 USD, reason: Duplicado`, ': cargo de $10.00. Motivo: Duplicado'],
+    ['ADJUSTMENT_REJECTED', `adjustment ${A}, reason: Sin evidencia`, '. Motivo: Sin evidencia'],
   ])('%s has no English left', (action, details, expected) => {
     const text = auditDetails(action, details)
     expect(text).toContain(expected)
