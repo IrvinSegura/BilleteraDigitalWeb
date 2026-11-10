@@ -17,11 +17,16 @@ export async function submitSignIn(page: Page, user: TestUser) {
   }
 }
 
-/** Signs in through the login screen and waits for the dashboard. */
-export async function signIn(page: Page, user: TestUser) {
+/**
+ * Signs in through the login screen and waits for the user's home: the dashboard for a customer, the console for
+ * staff (`/admin` or `/support/inbox`), who hold no money and never see the dashboard.
+ */
+export async function signIn(page: Page, user: TestUser, home = '/') {
   await submitSignIn(page, user)
-  await expect(page.getByRole('heading', { level: 1, name: user.fullName.split(' ')[0] })).toBeVisible()
-  await expect(page).toHaveURL('/')
+  if (home === '/') {
+    await expect(page.getByRole('heading', { level: 1, name: user.fullName.split(' ')[0] })).toBeVisible()
+  }
+  await expect(page).toHaveURL(home)
 }
 
 /** Formats an amount as the app shows it in Mexico, e.g. 1250 → "$1,250.00". */
