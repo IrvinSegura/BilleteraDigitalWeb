@@ -1,8 +1,8 @@
 # Billetera Digital — web
 
 Front en React + TypeScript + Vite para la API de la billetera digital
-([BilleteraDigital](https://github.com/IrvinSegura/BilleteraDigital-): Tailwind
-CSS 4, componentes de shadcn sobre Base UI, TanStack Query, React Hook Form + Zod y Recharts. Temas claro y oscuro, del
+[BilleteraDigital](https://github.com/IrvinSegura/BilleteraDigital-).
+Tailwind, CSS 4, componentes de shadcn sobre Base UI, TanStack Query, React Hook Form + Zod y Recharts. Temas claro y oscuro, del
 teléfono al escritorio.
 
 ## Capturas
