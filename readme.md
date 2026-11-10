@@ -1,224 +1,243 @@
 # Billetera Digital — web
 
-React + TypeScript + Vite front for the digital wallet API
-([BilleteraDigital-](https://github.com/IrvinSegura/BilleteraDigital-), the `billeterra-digital` folder): Tailwind
-CSS 4, shadcn components on Base UI, TanStack Query, React Hook Form + Zod and Recharts. Light and dark themes, phone to desktop.
+Front en React + TypeScript + Vite para la API de la billetera digital
+([BilleteraDigital-](https://github.com/IrvinSegura/BilleteraDigital-), la carpeta `billeterra-digital`): Tailwind
+CSS 4, componentes de shadcn sobre Base UI, TanStack Query, React Hook Form + Zod y Recharts. Temas claro y oscuro, del
+teléfono al escritorio.
 
-## Screenshots
+## Capturas
 
-Taken from the app running locally with demo people (`docs/screenshots`). Open each section's list for the rest.
+Tomadas de la app corriendo en local con personas de demostración (`docs/screenshots`). Abre la lista de cada sección para ver el resto.
 
-### Customers
+### Clientes
 
 | | |
 | --- | --- |
-| ![Customer home](docs/screenshots/customer-dashboard.png) | ![A wallet and its movements](docs/screenshots/customer-wallet.png) |
-| Home: balance, money in and out this month, balance chart, recent activity | A wallet: balance chart, movements, filters, CSV and statement |
-| ![Send money, confirmation step](docs/screenshots/customer-send.png) | ![Statements with the date range calendar](docs/screenshots/customer-statements.png) |
-| Sending: the transfer reviewed before it goes | Statements: the period picked on a calendar, with shortcuts |
+| ![Inicio del cliente](docs/screenshots/customer-dashboard.png) | ![Una billetera y sus movimientos](docs/screenshots/customer-wallet.png) |
+| Inicio: saldo, entradas y salidas del mes, gráfica del saldo y actividad reciente | Una billetera: gráfica del saldo, movimientos, filtros, CSV y estado de cuenta |
+| ![Enviar dinero, paso de confirmación](docs/screenshots/customer-send.png) | ![Estados de cuenta con el calendario de fechas](docs/screenshots/customer-statements.png) |
+| Envío: la transferencia se revisa antes de salir | Estados de cuenta: el periodo se elige en un calendario, con atajos |
 
 <details>
-<summary>More customer screens (11)</summary>
+<summary>Más pantallas del cliente (11)</summary>
 
 | | |
 | --- | --- |
-| ![Sign-in page](docs/screenshots/auth-login.png) | ![A movement](docs/screenshots/customer-movement.png) |
-| Sign-in | A movement, with its folio, receipt and "report a problem" |
-| ![A movement receipt](docs/screenshots/customer-receipt.png) | ![Request money with a QR code](docs/screenshots/customer-request.png) |
-| Its receipt, to print, save as PDF or share as an image | Request money: a payment link and QR code |
-| ![Withdraw dialog](docs/screenshots/customer-withdraw.png) | ![Bank accounts](docs/screenshots/customer-bank-accounts.png) |
-| Withdrawing: identity check and the new bank account's waiting period | Bank accounts (CLABE) for withdrawals |
-| ![Account settings](docs/screenshots/customer-settings.png) | ![Support chat](docs/screenshots/customer-support.png) |
-| My account: profile, two-factor, sessions, identity, email notices, password | Support: the bot first, then a person |
-| ![Home in the dark theme](docs/screenshots/customer-dashboard-dark.png) | <img src="docs/screenshots/customer-phone.png" alt="Home on a phone" width="260"> |
-| Dark theme | On a phone, with the tab bar |
-| <img src="docs/screenshots/customer-phone-support.png" alt="Support chat on a phone" width="260"> |  |
-| Support on a phone |  |
+| ![Inicio de sesión](docs/screenshots/auth-login.png) | ![Un movimiento](docs/screenshots/customer-movement.png) |
+| Inicio de sesión | Un movimiento, con su folio, comprobante y "reportar un problema" |
+| ![Comprobante de un movimiento](docs/screenshots/customer-receipt.png) | ![Cobrar con un código QR](docs/screenshots/customer-request.png) |
+| Su comprobante, para imprimir, guardar como PDF o compartir como imagen | Cobrar: un enlace de pago y un código QR |
+| ![Diálogo de retiro](docs/screenshots/customer-withdraw.png) | ![Cuentas bancarias](docs/screenshots/customer-bank-accounts.png) |
+| Retiro: verificación de identidad y el periodo de espera de una cuenta bancaria nueva | Cuentas bancarias (CLABE) para retiros |
+| ![Configuración de la cuenta](docs/screenshots/customer-settings.png) | ![Chat de soporte](docs/screenshots/customer-support.png) |
+| Mi cuenta: perfil, doble factor, sesiones, identidad, avisos por correo y contraseña | Soporte: primero el bot, después una persona |
+| ![Inicio en tema oscuro](docs/screenshots/customer-dashboard-dark.png) | <img src="docs/screenshots/customer-phone.png" alt="Inicio en un teléfono" width="260"> |
+| Tema oscuro | En un teléfono, con la barra de pestañas |
+| <img src="docs/screenshots/customer-phone-support.png" alt="Chat de soporte en un teléfono" width="260"> |  |
+| Soporte en un teléfono |  |
 
 </details>
 
-### Support agents
+### Agentes de soporte
 
 | | |
 | --- | --- |
-| ![Support inbox](docs/screenshots/support-inbox.png) | ![A support case](docs/screenshots/support-case.png) |
-| Inbox: the queue, the agent's figures and their cases | A case: header and actions, the customer's operations and what was escalated, then the chat |
-| ![Customer tab of a case](docs/screenshots/support-customer.png) | ![Escalated tickets](docs/screenshots/support-escalated.png) |
-| The customer's standing, identity included | Escalated: what the agent passed to administration |
+| ![Bandeja de soporte](docs/screenshots/support-inbox.png) | ![Un caso de soporte](docs/screenshots/support-case.png) |
+| Bandeja: la cola, las cifras del agente y sus casos | Un caso: encabezado y acciones, las operaciones del cliente y lo escalado, y luego el chat |
+| ![Pestaña del cliente en un caso](docs/screenshots/support-customer.png) | ![Tickets escalados](docs/screenshots/support-escalated.png) |
+| La situación del cliente, incluida su identidad | Escalados: lo que el agente pasó a administración |
 
 <details>
-<summary>More support screens (4)</summary>
+<summary>Más pantallas de soporte (4)</summary>
 
 | | |
 | --- | --- |
-| ![History tab of a case](docs/screenshots/support-history.png) | ![Notes tab of a case](docs/screenshots/support-notes.png) |
-| The customer's earlier cases | Notes for the team, which the customer never reads |
-| ![Suggest an answer to the bot](docs/screenshots/support-teach.png) | ![Close a case with a reason](docs/screenshots/support-resolve.png) |
-| Teaching the bot an answer | Closing a case with its reason |
+| ![Pestaña de historial de un caso](docs/screenshots/support-history.png) | ![Pestaña de notas de un caso](docs/screenshots/support-notes.png) |
+| Los casos anteriores del cliente | Notas para el equipo, que el cliente nunca ve |
+| ![Sugerir una respuesta al bot](docs/screenshots/support-teach.png) | ![Cerrar un caso con un motivo](docs/screenshots/support-resolve.png) |
+| Enseñarle una respuesta al bot | Cerrar un caso con su motivo |
 
 </details>
 
-### Administrators
+### Administradores
 
 | | |
 | --- | --- |
-| ![Administration home](docs/screenshots/admin-home.png) | ![A user in the console](docs/screenshots/admin-users.png) |
-| Home: money, operations and customers of the period, and what waits for an administrator | A user: account, two-factor, lockout and wallets (adjust, freeze) |
-| ![Support tickets](docs/screenshots/admin-tickets.png) | ![Support cases](docs/screenshots/admin-support.png) |
-| Tickets escalated by support | Support: the queue, how cases end and each case |
+| ![Inicio de administración](docs/screenshots/admin-home.png) | ![Un usuario en la consola](docs/screenshots/admin-users.png) |
+| Inicio: dinero, operaciones y clientes del periodo, y lo que espera a un administrador | Un usuario: cuenta, doble factor, bloqueo y billeteras (ajustar, congelar) |
+| ![Tickets de soporte](docs/screenshots/admin-tickets.png) | ![Casos de soporte](docs/screenshots/admin-support.png) |
+| Tickets escalados por soporte | Soporte: la cola, cómo terminan los casos y cada caso |
 
 <details>
-<summary>More administration screens (10)</summary>
+<summary>Más pantallas de administración (10)</summary>
 
 | | |
 | --- | --- |
-| ![Balance adjustments](docs/screenshots/admin-adjustments.png) | ![An adjustment waiting for approval](docs/screenshots/admin-adjustment.png) |
-| Balance adjustments | A large one waits for a second administrator |
-| ![Support team](docs/screenshots/admin-support-team.png) | ![Support bot](docs/screenshots/admin-support-bot.png) |
-| Support: each agent's figures | Support: what the bot couldn't answer and the agents' suggestions |
-| ![Wallets](docs/screenshots/admin-wallets.png) | ![Operations](docs/screenshots/admin-operations.png) |
-| Wallets by state | Operations: the last 7 days, what is pending, lookup by id |
-| ![Reconciliations](docs/screenshots/admin-reconciliations.png) | ![Ledger](docs/screenshots/admin-ledger.png) |
-| Reconciliations of the ledger | Ledger: the system accounts by currency |
-| ![Payment provider](docs/screenshots/admin-payments.png) | ![Audit log](docs/screenshots/admin-audit.png) |
-| Payment provider: its balance against the books, and its movements | Audit log, filtered by action, dates, actor and target |
+| ![Ajustes de saldo](docs/screenshots/admin-adjustments.png) | ![Un ajuste en espera de aprobación](docs/screenshots/admin-adjustment.png) |
+| Ajustes de saldo | Uno grande espera a un segundo administrador |
+| ![Equipo de soporte](docs/screenshots/admin-support-team.png) | ![Bot de soporte](docs/screenshots/admin-support-bot.png) |
+| Soporte: las cifras de cada agente | Soporte: lo que el bot no supo responder y las sugerencias de los agentes |
+| ![Billeteras](docs/screenshots/admin-wallets.png) | ![Operaciones](docs/screenshots/admin-operations.png) |
+| Billeteras por estado | Operaciones: los últimos 7 días, lo pendiente y búsqueda por id |
+| ![Conciliaciones](docs/screenshots/admin-reconciliations.png) | ![Libro mayor](docs/screenshots/admin-ledger.png) |
+| Conciliaciones del libro mayor | Libro mayor: las cuentas del sistema por moneda |
+| ![Proveedor de pagos](docs/screenshots/admin-payments.png) | ![Bitácora de auditoría](docs/screenshots/admin-audit.png) |
+| Proveedor de pagos: su saldo contra los libros, y sus movimientos | Bitácora de auditoría, filtrada por acción, fechas, actor y objetivo |
 
 </details>
 
-## Run locally
+## Correr en local
 
-1. Start the API (in the backend repo): `docker compose up -d`, then `./mvnw spring-boot:run`. It listens on
-   `http://localhost:8080`; Mailpit shows the emails it sends at `http://localhost:8025`.
-2. Here: `npm install`, then `npm run dev` and open `http://localhost:3000`.
+1. Arranca la API (en el repo del back): `docker compose up -d` y luego `./mvnw spring-boot:run`. Escucha en
+   `http://localhost:8080`; Mailpit muestra los correos que envía en `http://localhost:8025`.
+2. Aquí: `npm install`, luego `npm run dev` y abre `http://localhost:3000`.
 
-The dev server runs on port 3000 because the API's email links (`/verify-email`, `/reset-password`) and the payment
-return page (`/deposits/return`) point there. It proxies `/api` to the API (`API_PROXY_TARGET`, default
-`http://localhost:8080`), so the browser only talks to its own origin: no CORS setup, and the `SameSite=Strict`
-refresh cookie works.
+El servidor de desarrollo usa el puerto 3000 porque los enlaces de los correos de la API (`/verify-email`,
+`/reset-password`) y la página de regreso del pago (`/deposits/return`) apuntan ahí. Redirige `/api` a la API
+(`API_PROXY_TARGET`, por defecto `http://localhost:8080`), así que el navegador solo habla con su propio origen: no hay
+que configurar CORS y la cookie de renovación `SameSite=Strict` funciona.
 
-## Modules
+Las variables están descritas en `.env.example`. Para usar valores propios en tu máquina, cópialo como
+`.env.development.local` (git lo ignora); sin él, la app funciona igual.
 
-| Path | What it does |
+## Módulos
+
+| Ruta | Qué hace |
 | --- | --- |
-| `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email`, `/confirm-email-change` | Sign-in with two-factor step, sign-up, password reset and email links (confirming a new address signs out every session) |
-| `/change-password` | Where a new team account stays until it replaces the temporary password it was emailed |
-| `/` | Balance card, money in/out this month (summed by the API), balance chart over 7, 30 or 90 days, recent activity, account checklist |
-| `/wallets`, `/wallets/:id` | One wallet per currency (MXN, USD), movements with the other person and the concept, filtered by dates, type, direction and text (person, concept or folio), CSV export |
-| `/wallets/:id/statement` | A month's statement (opening and closing balance, every movement), to print or download as a PDF file |
-| `/statements` | Every statement in one place: each wallet's period at a glance, its PDF, and a general PDF covering all wallets. The period is the last month, the last three months, or dates picked on a calendar (`DateRangePicker`): two months side by side (one on a phone), shortcuts (previous full month, last 7, 30 or 90 days, year to date), nothing before the user's first record, after today or longer than 366 days, keyboard included; it only counts once applied. PDFs are built in the browser with jsPDF (loaded only when one is downloaded): table header on every page, folio and page numbers |
-| `/wallets/:id/receipts/:transactionId` | One movement's receipt: print or PDF, or shared as a PNG image (share sheet or download) |
-| Deposit / Send / Withdraw dialogs | Opened from anywhere; each money movement carries its own `Idempotency-Key`. Sending offers recent recipients and names who the email belongs to before confirming; sending and withdrawing show what the daily limit still allows |
-| Request ("Cobrar") dialog, `/send` | A payment link and QR code (`/send?to=&amount=&currency=&concept=`) that opens the payer's send dialog filled in for review; nothing is stored |
-| `/bank-accounts` | CLABE accounts for SPEI withdrawals (check digit validated, 24 h cooling-off shown), each with an optional name of the owner's |
-| `/notifications` | Notices with unread filter; new ones arrive live (see below). Delete one, or every read one |
-| `/settings` | Name and phone, email verification, which notices also arrive by email, active sessions (end one or all the others), password change, authenticator app (QR + recovery codes), change of email (link to the new address), a JSON copy of the account's data, and closing the account (only with no balance and nothing pending) |
-| `/support` | Chat with support: a bot that answers from the API's Markdown files, then a person. Files (JPG, PNG, WebP, PDF, MP4 up to 20 MB), and a survey when an agent attended it. While it is with a person the chat is read again every 3 s. "Report a problem" on a movement opens it with that movement named (`?wallet=&movement=`), and the report goes straight to a person |
-| `/support/inbox` | Support agents (`SUPPORT` role): the queue (who waits, how many are urgent, the longest wait), their own figures for the last 30 days (cases, closed, first reply, survey score) and their cases, searchable by name or folio and filtered by open or closed. An availability switch pauses new cases while keeping the one being attended; alerts for a new case are a sound and, if the browser allows it, a desktop notice (kept in this browser) |
-| `/support/inbox/:id` | One case on its own page: a header with the customer, its state, urgency (a problem with money goes first in the queue), folio and actions (teach the bot, give it back to the queue, pass it to a colleague, close it with a reason: solved, information only, escalated, no reply, duplicate or other). Below it, tabs with the customer's standing (identity included, only while open), their operations to escalate one as a ticket (or a problem that isn't about money: account access, identity), their earlier cases and the team's notes, which the customer never reads; then the chat with everything said to the bot, files and saved replies. Its notification opens the case |
-| `/support/escalated` | What the agent passed to the administrators from any of their cases, open or settled, with what was done and a link to the case. The menu counts the open ones, and a notice arrives when one is settled |
-| `/admin` | Home: the customers' money, the money moved, the operations and the new customers of the period (7, 30 or 90 days) against the one before; what is waiting for an administrator (identity to review, open tickets, adjustments to approve, unmatched provider movements); money moved per day, whether the books and the provider add up, new customers per day, accounts and wallets by state, support and the latest activity |
-| `/admin/adjustments`, `/admin/adjustments/:id` | Manual credits and debits to a wallet, with a reason, started from a user's wallet or a ticket. Above the API's limit they wait for a second administrator, who approves or rejects them; whoever asked can't approve but can withdraw |
-| `/admin/*` | Users (filtered by state and type, including making someone a support agent and creating team accounts, whose owner gets their role, address and a temporary password by email: nobody else sees it, and they must change it when they sign in) and wallets (counts and lists filtered by state, kept in the address), operations (the last 7 days' totals, what is still pending, and lookup by id), reconciliations, ledger, payment provider, support (the queue and how cases end, each case with its survey, close reason and notes; each agent's figures; and what the bot couldn't answer, with the agents' suggestions to add to its knowledge), audit log (admins with two-factor on) |
-| Any other address | A not-found page with the way home |
-| Search fields | Users, operations, audit log and movements preview up to 6 matches as you type (`SuggestInput`); the recipient field only looks among people already paid, so it can't reveal who has an account |
+| `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email`, `/confirm-email-change` | Inicio de sesión con paso de doble factor, registro, restablecimiento de contraseña y enlaces de correo (confirmar una dirección nueva cierra todas las sesiones) |
+| `/change-password` | Donde se queda una cuenta nueva del equipo hasta que reemplaza la contraseña temporal que recibió por correo |
+| `/` | Tarjeta de saldo, entradas y salidas del mes (sumadas por la API), gráfica del saldo de 7, 30 o 90 días, actividad reciente y lista de pendientes de la cuenta |
+| `/wallets`, `/wallets/:id` | Una billetera por moneda (MXN, USD), movimientos con la otra persona y el concepto, filtrados por fechas, tipo, dirección y texto (persona, concepto o folio), exportación a CSV |
+| `/wallets/:id/statement` | El estado de cuenta de un mes (saldo inicial y final, cada movimiento), para imprimir o descargar como PDF |
+| `/statements` | Todos los estados de cuenta en un lugar: el periodo de cada billetera de un vistazo, su PDF y un PDF general con todas las billeteras. El periodo es el último mes, los últimos tres meses o fechas elegidas en un calendario (`DateRangePicker`): dos meses lado a lado (uno en el teléfono), atajos (mes completo anterior, últimos 7, 30 o 90 días, lo que va del año), nada antes del primer registro del usuario, después de hoy ni de más de 366 días, también con teclado; solo cuenta al aplicarlo. Los PDF se generan en el navegador con jsPDF (que se carga solo al descargar uno): encabezado de la tabla en cada página, folio y números de página |
+| `/wallets/:id/receipts/:transactionId` | El comprobante de un movimiento: imprimir o PDF, o compartir como imagen PNG (menú de compartir o descarga) |
+| Diálogos de Depositar / Enviar / Retirar | Se abren desde cualquier lugar; cada movimiento de dinero lleva su propio `Idempotency-Key`. Enviar ofrece destinatarios recientes y dice de quién es el correo antes de confirmar; enviar y retirar muestran lo que aún permite el límite diario |
+| Diálogo de Cobrar, `/send` | Un enlace de pago y un código QR (`/send?to=&amount=&currency=&concept=`) que abre el diálogo de envío del pagador ya lleno para revisarlo; no se guarda nada |
+| `/bank-accounts` | Cuentas CLABE para retiros por SPEI (con dígito verificador validado y el periodo de espera de 24 h a la vista), cada una con un nombre opcional que elige el dueño |
+| `/notifications` | Avisos con filtro de no leídos; los nuevos llegan en vivo (ver abajo). Borrar uno, o todos los leídos |
+| `/settings` | Nombre y teléfono, verificación del correo, qué avisos llegan también por correo, sesiones activas (cerrar una o todas las demás), cambio de contraseña, app de autenticación (QR + códigos de recuperación), cambio de correo (enlace a la dirección nueva), una copia en JSON de los datos de la cuenta y cierre de la cuenta (solo sin saldo y sin nada pendiente) |
+| `/settings/identity` | Verificación de identidad con la INE: sus datos, las fotos de frente y reverso y una selfie, que revisa un administrador; retirar dinero la requiere |
+| `/support` | Chat con soporte: un bot que responde desde los archivos Markdown de la API y luego una persona. Archivos (JPG, PNG, WebP, PDF, MP4 de hasta 20 MB) y una encuesta cuando lo atendió un agente. Mientras está con una persona, el chat se vuelve a leer cada 3 s. "Reportar un problema" en un movimiento lo abre con ese movimiento indicado (`?wallet=&movement=`), y el reporte va directo a una persona |
+| `/support/inbox` | Agentes de soporte (rol `SUPPORT`): la cola (quién espera, cuántos son urgentes, la espera más larga), sus propias cifras de los últimos 30 días (casos, cerrados, primera respuesta, calificación de la encuesta) y sus casos, con búsqueda por nombre o folio y filtro de abiertos o cerrados. Un interruptor de disponibilidad pausa los casos nuevos sin soltar el que se está atendiendo; un caso nuevo avisa con un sonido y, si el navegador lo permite, con una notificación de escritorio (se recuerda en este navegador) |
+| `/support/inbox/:id` | Un caso en su propia página: un encabezado con el cliente, su estado, la urgencia (un problema con dinero va primero en la cola), el folio y las acciones (enseñarle al bot, devolverlo a la cola, pasarlo a un compañero, cerrarlo con un motivo: resuelto, solo información, escalado, sin respuesta, duplicado u otro). Debajo, pestañas con la situación del cliente (incluida su identidad, solo mientras está abierto), sus operaciones para escalar una como ticket (o un problema que no es de dinero: acceso a la cuenta, identidad), sus casos anteriores y las notas del equipo, que el cliente nunca ve; luego el chat con todo lo dicho al bot, los archivos y las respuestas guardadas. Su notificación abre el caso |
+| `/support/escalated` | Lo que el agente pasó a los administradores desde cualquiera de sus casos, abierto o resuelto, con lo que se hizo y un enlace al caso. El menú cuenta los abiertos, y llega un aviso cuando se resuelve uno |
+| `/admin` | Inicio: el dinero de los clientes, el dinero movido, las operaciones y los clientes nuevos del periodo (7, 30 o 90 días) frente al anterior; lo que espera a un administrador (identidades por revisar, tickets abiertos, ajustes por aprobar, movimientos del proveedor sin conciliar); dinero movido por día, si los libros y el proveedor cuadran, clientes nuevos por día, cuentas y billeteras por estado, soporte y la actividad más reciente |
+| `/admin/identity`, `/admin/identity/:id` | Las INE que enviaron los clientes, por estado: ver sus datos y fotos, y aprobarlas o rechazarlas con un motivo que el cliente recibe |
+| `/admin/tickets`, `/admin/tickets/:id` | Los tickets que escaló soporte, para resolverlos con lo que se hizo (o con un ajuste de saldo); el cliente y el agente reciben un aviso |
+| `/admin/adjustments`, `/admin/adjustments/:id` | Abonos y cargos manuales a una billetera, con un motivo, iniciados desde la billetera de un usuario o desde un ticket. Por encima del límite de la API esperan a un segundo administrador, que los aprueba o rechaza; quien lo pidió no puede aprobarlo, pero sí retirarlo |
+| `/admin/*` | Usuarios (filtrados por estado y tipo, incluido hacer a alguien agente de soporte y crear cuentas del equipo, cuyo dueño recibe por correo su rol, su dirección y una contraseña temporal: nadie más la ve, y debe cambiarla al iniciar sesión) y billeteras (conteos y listas filtradas por estado, guardadas en la dirección), operaciones (los totales de los últimos 7 días, lo que sigue pendiente y búsqueda por id), conciliaciones, libro mayor, proveedor de pagos, soporte (la cola y cómo terminan los casos, cada caso con su encuesta, motivo de cierre y notas; las cifras de cada agente; y lo que el bot no supo responder, con las sugerencias de los agentes para agregarlo a su conocimiento) y bitácora de auditoría (administradores con doble factor activo) |
+| Cualquier otra dirección | Una página de "no encontrado" con el camino al inicio |
+| Campos de búsqueda | Usuarios, operaciones, bitácora de auditoría y movimientos muestran hasta 6 coincidencias mientras escribes (`SuggestInput`); el campo de destinatario solo busca entre personas a las que ya se les pagó, así que no puede revelar quién tiene cuenta |
 
-On a computer the side menu can be hidden with the button at the top left, for any role, to give the page the whole
-width; the browser remembers it. Phones use the menu button and the bottom tab bar instead.
+El personal (administradores y agentes de soporte) no maneja dinero: no ve billeteras, envíos, cuentas bancarias,
+estados de cuenta ni el chat de clientes, y al entrar llega a su consola (`/admin` o `/support/inbox`).
 
-Code lives by feature in `src/features/*`; shared pieces are in `src/components`, `src/lib` and `src/api`.
+En una computadora, el menú lateral se puede ocultar con el botón de arriba a la izquierda, para cualquier rol, y así
+dejarle todo el ancho a la página; el navegador lo recuerda. En los teléfonos se usan el botón de menú y la barra de
+pestañas de abajo.
 
-## How it talks to the API
+El código vive por funcionalidad en `src/features/*`; las piezas compartidas están en `src/components`, `src/lib` y
+`src/api`.
 
-Every call sends the language the app shows as `Accept-Language`, and a signed-in app saves it to the account whenever it
-changes, so emails go out in that language.
+## Cómo habla con la API
 
-- `src/api/schema.d.ts` is generated from the API's OpenAPI document; regenerate it with `npm run api:generate`
-  (API running) whenever its endpoints change.
-- `src/api/client.ts` is the typed client (`openapi-fetch`). Calls go through `unwrap`, which throws an
-  `ApiError` carrying the API's error `code`; `errorMessage` turns it into a Spanish message.
-- Sessions use the API's browser mode (`X-Session-Mode: cookie`): the access token lives only in memory and the
-  refresh token in an `HttpOnly` cookie. A reload restores the session with `/api/v1/auth/refresh`, a 401 on any
-  call renews the token once and retries, and an API that doesn't answer shows a retry screen instead of
-  signing the user out.
-- Admin endpoints need a session that signed in with a two-factor code; turning two-factor on signs the user out
-  so the next sign-in gets one.
-- New notifications arrive over a server-sent event stream (`/api/v1/notifications/stream`), read with `fetch`
-  because `EventSource` can't send the access token (`src/features/notifications/live.ts`). Each one refreshes the
-  inbox, balances and movements, with a toast for what the user didn't do themselves. The stream reconnects when
-  the server closes it and backs off after failures; a hidden tab lets go of it. While it is connected the bell
-  polls every five minutes instead of every 30 seconds.
+Cada llamada envía como `Accept-Language` el idioma que muestra la app, y una app con sesión iniciada lo guarda en la
+cuenta cada vez que cambia, para que los correos lleguen en ese idioma.
 
-## Installing and offline use
+- `src/api/schema.d.ts` se genera del documento OpenAPI de la API; vuelve a generarlo con `npm run api:generate`
+  (con la API corriendo) cada vez que cambien sus endpoints.
+- `src/api/client.ts` es el cliente tipado (`openapi-fetch`). Las llamadas pasan por `unwrap`, que lanza un `ApiError`
+  con el `code` de error de la API; `errorMessage` lo convierte en un mensaje en el idioma de la app.
+- Las sesiones usan el modo navegador de la API (`X-Session-Mode: cookie`): el token de acceso vive solo en memoria y
+  el de renovación en una cookie `HttpOnly`. Al recargar, la sesión se recupera con `/api/v1/auth/refresh`; un 401 en
+  cualquier llamada renueva el token una vez y reintenta, y si la API no responde se muestra una pantalla para
+  reintentar en lugar de cerrar la sesión.
+- Los endpoints de administración necesitan una sesión iniciada con un código de doble factor; activar el doble factor
+  cierra la sesión para que el siguiente inicio lo pida.
+- Las notificaciones nuevas llegan por un flujo de eventos del servidor (`/api/v1/notifications/stream`), leído con
+  `fetch` porque `EventSource` no puede enviar el token de acceso (`src/features/notifications/live.ts`). Cada una
+  actualiza la bandeja, los saldos y los movimientos, con un aviso emergente para lo que el usuario no hizo él mismo.
+  El flujo se reconecta cuando el servidor lo cierra y espera más después de cada fallo; una pestaña oculta lo suelta.
+  Mientras está conectado, la campana consulta cada cinco minutos en lugar de cada 30 segundos.
 
-- The app is installable (`public/manifest.webmanifest`, icons in `public/icons`). In builds a service worker
-  (`public/sw.js`) keeps the app itself: pages from the network with the last one as a fallback, hashed files
-  from the cache. It never caches API answers.
-- Opened without a connection, the app shows the last data the user saw (wallets, movements, notifications) with a
-  notice of when it was saved, and reloads when the connection is back. That snapshot is in `localStorage`
-  (`src/auth/offline-snapshot.ts`), holds no tokens, expires after seven days and is deleted on sign-out, idle
-  sign-out or an expired session.
+## Instalación y uso sin conexión
 
-## Security
+- La app se puede instalar (`public/manifest.webmanifest`, íconos en `public/icons`). En los builds, un service worker
+  (`public/sw.js`) guarda la app misma: las páginas desde la red con la última como respaldo, y los archivos con hash
+  desde la caché. Nunca guarda respuestas de la API.
+- Si se abre sin conexión, la app muestra los últimos datos que vio el usuario (billeteras, movimientos,
+  notificaciones) con un aviso de cuándo se guardaron, y se recarga cuando vuelve la conexión. Esa copia está en
+  `localStorage` (`src/auth/offline-snapshot.ts`), no guarda tokens, caduca a los siete días y se borra al cerrar
+  sesión, al cerrarse por inactividad o cuando la sesión expira.
 
-- Sessions: access token in memory only, refresh token in an `HttpOnly`, `Secure`, `SameSite=Strict` cookie that the
-  API accepts only with the `X-Session-Mode` header (no CSRF).
-- Ten minutes without activity in any tab shows a one-minute warning, then signs out (`src/auth/IdleGuard.tsx`).
-- Signing out in one tab signs out every tab; signing in lets waiting tabs pick up the session
+## Seguridad
+
+- Sesiones: token de acceso solo en memoria y token de renovación en una cookie `HttpOnly`, `Secure`, `SameSite=Strict`
+  que la API acepta solo con el encabezado `X-Session-Mode` (sin CSRF).
+- Diez minutos sin actividad en ninguna pestaña muestran un aviso de un minuto y luego cierran la sesión
+  (`src/auth/IdleGuard.tsx`).
+- Cerrar sesión en una pestaña la cierra en todas; iniciar sesión deja que las pestañas en espera tomen la sesión
   (`src/auth/session-sync.ts`).
-- A deposit only redirects to an `https` checkout on a known provider host (`src/features/money/checkout-url.ts`).
-- `npm run build` writes the production headers (CSP with the inline theme script's hash, HSTS,
-  `frame-ancestors 'none'`, nosniff, Referrer-Policy, Permissions-Policy) to `dist/_headers` (Netlify, Cloudflare
-  Pages) and `dist/nginx-security-headers.conf` (nginx: `include` it in the `server` block). `npm run preview` serves
-  the build with them on `http://localhost:4173`. Rebuild after changing the inline script in `index.html`: its hash
-  changes. See `security-headers.ts`.
-- `npm audit --omit=dev` reports nothing. `npm audit` still lists moderate and low advisories in build-time tools
-  only (`minimatch` inside `openapi-typescript` and the `shadcn` CLI, `deepmerge` in `shadcn`): none reaches the
-  bundle, and their fixes break those tools or don't exist yet, so they wait for upstream releases.
+- Un depósito solo redirige a un checkout `https` en un host conocido del proveedor (`src/features/money/checkout-url.ts`).
+- `npm run build` escribe los encabezados de producción (CSP con el hash del script de tema en línea, HSTS,
+  `frame-ancestors 'none'`, nosniff, Referrer-Policy, Permissions-Policy) en `dist/_headers` (Netlify, Cloudflare
+  Pages) y en `dist/nginx-security-headers.conf` (nginx: agrégalo con `include` en el bloque `server`).
+  `npm run preview` sirve el build con ellos en `http://localhost:4173`. Vuelve a hacer el build después de cambiar el
+  script en línea de `index.html`: su hash cambia. Ver `security-headers.ts`.
+- `npm audit --omit=dev` no reporta nada. `npm audit` todavía lista avisos moderados y bajos solo en herramientas de
+  build (`minimatch` dentro de `openapi-typescript` y del CLI de `shadcn`, `deepmerge` en `shadcn`): ninguno llega al
+  bundle, y sus correcciones rompen esas herramientas o aún no existen, así que esperan a nuevas versiones.
 
-## Errors and monitoring
+## Errores y monitoreo
 
-- A screen that fails to render shows an error screen instead of a blank page: one boundary around the whole app
-  and one around each layout's page, so the navigation keeps working and going to another page clears the error
-  (`src/components/ErrorBoundary.tsx`).
-- A tab left open across a release asks for screen chunks that no longer exist; it reloads once to pick up the
-  new release, then offers a reload button instead of looping (`src/lib/chunk-reload.ts`).
-- Errors go to Sentry when `VITE_SENTRY_DSN` is set (empty turns it off). The SDK loads in its own chunk after
-  start-up, only with a DSN. Nothing identifying is sent: no user, cookies, query strings, URL fragments (emailed
-  tokens), bodies or console output (`src/lib/monitoring.ts`). The build adds the DSN's ingest origin to the CSP's
-  `connect-src`; set `VITE_APP_VERSION` (e.g. the commit SHA) so reports name their build.
+- Una pantalla que falla al renderizar muestra una pantalla de error en lugar de una página en blanco: hay un límite
+  de errores alrededor de toda la app y otro alrededor de la página de cada layout, así que la navegación sigue
+  funcionando e ir a otra página limpia el error (`src/components/ErrorBoundary.tsx`).
+- Una pestaña que quedó abierta durante una nueva versión pide fragmentos de pantallas que ya no existen; se recarga
+  una vez para tomar la nueva versión y luego ofrece un botón para recargar en lugar de quedarse en un ciclo
+  (`src/lib/chunk-reload.ts`).
+- Los errores van a Sentry cuando `VITE_SENTRY_DSN` tiene valor (vacío lo apaga). El SDK se carga en su propio
+  fragmento después del arranque, y solo con un DSN. No se envía nada que identifique: ni usuario, cookies, query
+  strings, fragmentos de la URL (tokens de los correos), cuerpos ni la salida de la consola (`src/lib/monitoring.ts`).
+  El build agrega el origen de ingesta del DSN al `connect-src` de la CSP; define `VITE_APP_VERSION` (por ejemplo, el
+  SHA del commit) para que cada reporte diga de qué build viene.
 
-## Tests
+## Pruebas
 
-- `npm test`: unit and component tests with Vitest and Testing Library (`src/**/*.test.ts(x)`); `npm run
-  test:coverage` adds a coverage report.
-- `npm run test:e2e`: end-to-end flows with Playwright (`e2e/`) against the local API and Mailpit, which must be
-  running (see *Run locally*); it starts the dev server if it isn't up. Each test creates its own users through
-  the API, verified with the emailed link and, where needed, with an authenticator app, so runs are independent.
-  The API rate-limits auth requests per address and every test comes from localhost: refused ones are sent again
-  after a pause (`e2e/support/fixtures.ts`), so a full run takes about a minute. `npm run test:e2e:ui` opens
-  Playwright's UI mode.
-- `e2e/accessibility.spec.ts` checks the main screens and dialogs with axe (WCAG 2.1 A and AA).
-- `e2e/admin.spec.ts` makes its administrator by setting the role in the database (the API has no endpoint for it),
-  with `docker exec` on the backend's PostgreSQL container: `E2E_DB_CONTAINER` (default
-  `billeterra-digital-postgres-1`), `E2E_DB_NAME` (`wallet`) and `E2E_DB_USER` (`wallet_owner`) point it elsewhere.
-- `e2e/support.spec.ts` makes its agent the same way. Any free agent can get its case, so it first turns the agents
-  of earlier runs back into customers and closes the cases they left in the queue (test accounts only).
-- `e2e/identity.spec.ts` (an INE sent from the settings, then approved and rejected in the console) and
-  `e2e/adjustments.spec.ts` (a credit applied at once, a large one approved by a second administrator, and a
-  withdrawn request) make their administrators the same way. The API takes each CURP and voter key once, so every
-  run generates valid new ones, and the photos are PNGs built in the test (`e2e/support/identity.ts`).
-- Unit tests share helpers in `src/test`: `stubApi()` (a fake API behind `fetch`; import the code under test after
-  it), the `auth` mock with `testUser()`, `renderWithProviders`/`renderDialog` and common fixtures.
-- `e2e/offline.spec.ts` needs the service worker, which only the build has: run it with `npm run build`, then
-  `npm run preview` and `E2E_PREVIEW=1 E2E_BASE_URL=http://localhost:4173 npm run test:e2e -- offline`.
-- CI (`.github/workflows/ci.yml`) runs the linter, the type-checked build and the unit tests on every pull request.
-  The end-to-end tests need the API, so they run locally.
+- `npm test`: pruebas unitarias y de componentes con Vitest y Testing Library (`src/**/*.test.ts(x)`);
+  `npm run test:coverage` agrega un reporte de cobertura.
+- `npm run test:e2e`: flujos de punta a punta con Playwright (`e2e/`) contra la API local y Mailpit, que deben estar
+  corriendo (ver *Correr en local*); arranca el servidor de desarrollo si no está arriba. Cada prueba crea sus propios
+  usuarios por la API, verificados con el enlace del correo y, cuando hace falta, con una app de autenticación, así
+  que las corridas son independientes. La API limita las peticiones de autenticación por dirección y todas las
+  pruebas vienen de localhost: las rechazadas se reenvían después de una pausa (`e2e/support/fixtures.ts`), así que
+  una corrida completa tarda cerca de un minuto. `npm run test:e2e:ui` abre el modo UI de Playwright.
+- `e2e/accessibility.spec.ts` revisa las pantallas y diálogos principales con axe (WCAG 2.1 A y AA).
+- `e2e/admin.spec.ts` crea su administrador poniendo el rol en la base de datos (la API no tiene un endpoint para eso),
+  con `docker exec` sobre el contenedor de PostgreSQL del back: `E2E_DB_CONTAINER` (por defecto
+  `billeterra-digital-postgres-1`), `E2E_DB_NAME` (`wallet`) y `E2E_DB_USER` (`wallet_owner`) lo apuntan a otro lado.
+- `e2e/support.spec.ts` crea su agente de la misma forma. Cualquier agente libre puede tomar su caso, así que primero
+  vuelve clientes a los agentes de corridas anteriores y cierra los casos que dejaron en la cola (solo cuentas de
+  prueba).
+- `e2e/identity.spec.ts` (una INE enviada desde la configuración y luego aprobada y rechazada en la consola) y
+  `e2e/adjustments.spec.ts` (un abono aplicado de inmediato, uno grande aprobado por un segundo administrador y una
+  solicitud retirada) crean sus administradores de la misma forma. La API acepta cada CURP y clave de elector una sola
+  vez, así que cada corrida genera unas nuevas y válidas, y las fotos son PNG creados en la prueba
+  (`e2e/support/identity.ts`).
+- Las pruebas unitarias comparten ayudas en `src/test`: `stubApi()` (una API falsa detrás de `fetch`; importa el código
+  a probar después de llamarla), el mock de `auth` con `testUser()`, `renderWithProviders`/`renderDialog` y datos de
+  prueba comunes.
+- `e2e/offline.spec.ts` necesita el service worker, que solo tiene el build: córrela con `npm run build`, luego
+  `npm run preview` y `E2E_PREVIEW=1 E2E_BASE_URL=http://localhost:4173 npm run test:e2e -- offline`.
+- El CI (`.github/workflows/ci.yml`) corre el linter, el build con revisión de tipos y las pruebas unitarias en cada
+  pull request. Las pruebas de punta a punta necesitan la API, así que se corren en local.
 
-## Deploying
+## Despliegue
 
-Serve the app from the API's own site (same origin, or the same reverse proxy) and leave `VITE_API_URL` empty.
-If the API is on another origin, it must be on the same site (e.g. `app.example.com` and `api.example.com`): set
-`VITE_API_URL` to it and add this app's origin to the API's `CORS_ALLOWED_ORIGINS`. Set the API's
-`wallet.notifications.email.app-url` and `wallet.payments.return-url` to this app's address. Set
-`VITE_SUPPORT_EMAIL` to the inbox that answers people who can't sign in: the support chat needs a session, so the
-sign-in page shows this address to them, and hides it when empty.
+Sirve la app desde el mismo sitio de la API (mismo origen, o el mismo proxy inverso) y deja `VITE_API_URL` vacío. Si
+la API está en otro origen, debe estar en el mismo sitio (por ejemplo, `app.example.com` y `api.example.com`): pon su
+dirección en `VITE_API_URL` y agrega el origen de esta app a `CORS_ALLOWED_ORIGINS` de la API. Pon la dirección de
+esta app en `wallet.notifications.email.app-url` y `wallet.payments.return-url` de la API. Pon en
+`VITE_SUPPORT_EMAIL` el correo que atiende a quienes no pueden iniciar sesión: el chat de soporte necesita una sesión,
+así que la página de inicio de sesión les muestra esta dirección, y la oculta si está vacía. En producción, estas
+variables se definen en el CI o en el servidor donde se hace el build.
