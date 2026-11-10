@@ -28,6 +28,8 @@ export const keys = {
   unreadCount: ['notifications', 'unread-count'] as const,
   twoFactor: ['two-factor'] as const,
   recipients: ['transfers', 'recipients'] as const,
+  identity: ['identity-verification'] as const,
+  withdrawalCurrencies: ['withdrawals', 'currencies'] as const,
 }
 
 export function useWallets() {
@@ -57,14 +59,14 @@ export function useMovements(walletId: string | undefined, page = 0, size = 20, 
 }
 
 /**
- * A calendar month of the wallet (`yyyy-MM`, the current one by default): its opening and closing balances and the
- * money in and out, summed by the API over every movement.
+ * The wallet's opening and closing balances and the money in and out, summed by the API over every movement: for a
+ * period of days (both included, at most a year), or for the current month without one.
  */
-export function useWalletSummary(walletId: string | undefined, month?: string) {
+export function useWalletSummary(walletId: string | undefined, period?: { from: string; to: string }) {
   return useQuery({
-    queryKey: keys.summary(walletId ?? '', month),
+    queryKey: keys.summary(walletId ?? '', period ? `${period.from}_${period.to}` : undefined),
     queryFn: () => unwrap(api.GET('/api/v1/wallets/{walletId}/summary', {
-      params: { path: { walletId: walletId! }, query: { month } },
+      params: { path: { walletId: walletId! }, query: { ...period } },
     })),
     enabled: !!walletId,
   })
@@ -112,6 +114,61 @@ export function useUnreadCount() {
   })
 }
 
+/** How many tickets wait for an administrator, for the menu; only asked when the user is one. */
+export function useOpenTicketCount(enabled: boolean) {
+  return useQuery({
+    queryKey: ['admin', 'tickets', 'open-count'],
+    queryFn: () => unwrap(api.GET('/api/v1/admin/support/tickets', { params: { query: { status: 'OPEN', size: 1 } } })),
+    enabled,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
+  })
+}
+
+/** How many of the tickets the agent escalated still wait for the administrators, for the menu. */
+export function useMyOpenTicketCount(enabled: boolean) {
+  return useQuery({
+    queryKey: ['support', 'escalated', 'open-count'],
+    queryFn: () => unwrap(api.GET('/api/v1/support/agent/tickets', { params: { query: { status: 'OPEN', size: 1 } } })),
+    enabled,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
+  })
+}
+
+/** How many INE wait for review, for the menu and the administrators' home. */
+export function usePendingIdentityCount(enabled: boolean) {
+  return useQuery({
+    queryKey: ['admin', 'identity', 'pending-count'],
+    queryFn: () => unwrap(api.GET('/api/v1/admin/identity-verifications', { params: { query: { status: 'PENDING_REVIEW', size: 1 } } })),
+    enabled,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
+  })
+}
+
+/** How many adjustments wait for a second administrator. */
+export function usePendingAdjustmentCount(enabled: boolean) {
+  return useQuery({
+    queryKey: ['admin', 'adjustments', 'pending-count'],
+    queryFn: () => unwrap(api.GET('/api/v1/admin/adjustments', { params: { query: { status: 'PENDING_APPROVAL', size: 1 } } })),
+    enabled,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
+  })
+}
+
+/** The payment provider's movements nothing explains yet, and those still settling. */
+export function useProviderTransactionCounts(enabled: boolean) {
+  return useQuery({
+    queryKey: ['admin', 'payments', 'counts'],
+    queryFn: () => unwrap(api.GET('/api/v1/admin/payments/provider-transactions/counts')),
+    enabled,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
+  })
+}
+
 export function useTwoFactorStatus() {
   return useQuery({
     queryKey: keys.twoFactor,
@@ -134,5 +191,29 @@ export function useWalletLimits(walletId: string | undefined) {
     queryKey: keys.limits(walletId ?? ''),
     enabled: !!walletId,
     queryFn: () => unwrap(api.GET('/api/v1/wallets/{walletId}/limits', { params: { path: { walletId: walletId! } } })),
+  })
+}
+
+/**
+ * Whether a wallet's currency can be withdrawn: the payout provider may pay only some (STP, only pesos). Until the
+ * answer arrives, or if it can't be had, every currency counts as one, and the API still refuses the others.
+ */
+export function useCanWithdraw() {
+  const { data } = useQuery({
+    queryKey: keys.withdrawalCurrencies,
+    queryFn: () => unwrap(api.GET('/api/v1/withdrawals/currencies')),
+    // Set by the server's configuration, so it doesn't change while the app is open
+    staleTime: Infinity,
+  })
+  const currencies = data?.currencies
+  return (currency: string | undefined) => !currencies || (!!currency && currencies.includes(currency))
+}
+
+/** Where the customer's identity check stands: NOT_STARTED, PENDING_REVIEW, VERIFIED or REJECTED. */
+export function useIdentityVerification(enabled = true) {
+  return useQuery({
+    queryKey: keys.identity,
+    queryFn: () => unwrap(api.GET('/api/v1/users/me/identity-verification')),
+    enabled,
   })
 }

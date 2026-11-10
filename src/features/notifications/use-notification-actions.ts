@@ -15,7 +15,10 @@ const destinations: Record<string, string> = {
   TRANSFER_RECEIVED: '/wallets',
   WALLET_FROZEN: '/wallets',
   WALLET_UNFROZEN: '/wallets',
+  WALLET_ADJUSTED: '/wallets',
   BANK_ACCOUNT_ADDED: '/bank-accounts',
+  IDENTITY_VERIFIED: '/settings/identity',
+  IDENTITY_REJECTED: '/settings/identity',
   PASSWORD_CHANGED: '/settings',
   TWO_FACTOR_ENABLED: '/settings',
   TWO_FACTOR_DISABLED: '/settings',
@@ -23,6 +26,8 @@ const destinations: Record<string, string> = {
   SUPPORT_AGENT_JOINED: '/support',
   SUPPORT_AGENT_REPLIED: '/support',
   SUPPORT_CASE_RESOLVED: '/support',
+  SUPPORT_TICKET_RESOLVED: '/support',
+  SUPPORT_ESCALATION_RESOLVED: '/support/escalated',
 }
 
 function destinationOf(notification: Notification) {

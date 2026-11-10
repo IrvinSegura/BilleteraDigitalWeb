@@ -44,13 +44,19 @@ export function hasCode(error: unknown, code: string): boolean {
 
 /** The API refused the new password itself (length, too easy to guess, or leaked): its message goes under that field. */
 export function isPasswordRejected(error: unknown): boolean {
-  return ['WEAK_PASSWORD', 'COMMON_PASSWORD', 'BREACHED_PASSWORD'].some((code) => hasCode(error, code))
+  return ['WEAK_PASSWORD', 'COMMON_PASSWORD', 'BREACHED_PASSWORD', 'PASSWORD_UNCHANGED'].some((code) => hasCode(error, code))
 }
 
 // The API's details are in English: known codes get their own message in the active language, built from the
 // detail's numbers when it carries some (limits, dates); anything else gets one for its status.
 function grab(detail: string, pattern: RegExp): string[] {
   return detail.match(pattern)?.slice(1) ?? []
+}
+
+/** The message for the reason that closes the detail ("...: BALANCE"), or the code's own when it is a new one. */
+function byReason(detail: string, group: string, code: string): string {
+  const key = `${group}.${grab(detail, /: (\w+)$/)[0] ?? ''}`
+  return i18n.exists(key) ? i18n.t(key as MessageKey) : i18n.t(`errors.codes.${code}` as MessageKey)
 }
 
 const detailMessages: Record<string, (detail: string) => string> = {
@@ -70,10 +76,11 @@ const detailMessages: Record<string, (detail: string) => string> = {
   BANK_ACCOUNT_LIMIT_REACHED: (d) =>
     i18n.t('errors.details.bankAccountLimit', { max: grab(d, /at most (\d+)/)[0] ?? i18n.t('errors.details.some') }),
   // The reason closes the detail ("... cannot be closed: BALANCE") and says what to do first
-  ACCOUNT_CANNOT_BE_CLOSED: (d) => {
-    const key = `errors.details.cannotClose.${grab(d, /: (\w+)$/)[0] ?? ''}`
-    return i18n.exists(key) ? i18n.t(key as MessageKey) : i18n.t('errors.codes.ACCOUNT_CANNOT_BE_CLOSED')
-  },
+  ACCOUNT_CANNOT_BE_CLOSED: (d) => byReason(d, 'errors.details.cannotClose', 'ACCOUNT_CANNOT_BE_CLOSED'),
+  // So do the identity checks and the promotion to the team
+  INVALID_IDENTITY_DOCUMENT: (d) => byReason(d, 'errors.details.identity', 'INVALID_IDENTITY_DOCUMENT'),
+  IDENTITY_VERIFICATION_CONFLICT: (d) => byReason(d, 'errors.details.identity', 'IDENTITY_VERIFICATION_CONFLICT'),
+  ROLE_CHANGE_BLOCKED: (d) => byReason(d, 'errors.details.roleBlocked', 'ROLE_CHANGE_BLOCKED'),
   BANK_ACCOUNT_COOLING_OFF: (d) => {
     const [from] = grab(d, /from (\S+)$/)
     return from && !Number.isNaN(new Date(from).getTime())

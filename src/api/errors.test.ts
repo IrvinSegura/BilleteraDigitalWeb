@@ -26,6 +26,7 @@ describe('ApiError', () => {
     expect(isPasswordRejected(new ApiError(422, { code: 'WEAK_PASSWORD' }))).toBe(true)
     expect(isPasswordRejected(new ApiError(422, { code: 'COMMON_PASSWORD' }))).toBe(true)
     expect(isPasswordRejected(new ApiError(422, { code: 'BREACHED_PASSWORD' }))).toBe(true)
+    expect(isPasswordRejected(new ApiError(422, { code: 'PASSWORD_UNCHANGED' }))).toBe(true)
     expect(isPasswordRejected(new ApiError(422, { code: 'INCORRECT_PASSWORD' }))).toBe(false)
   })
 })
@@ -33,6 +34,20 @@ describe('ApiError', () => {
 describe('errorMessage', () => {
   it('translates a known code', () => {
     expect(errorMessage(new ApiError(422, { code: 'INSUFFICIENT_FUNDS' }))).toBe('No tienes saldo suficiente.')
+  })
+
+  it('says what is wrong with the INE, from the reason that ends the detail', () => {
+    const invalid = (reason: string) => new ApiError(422, {
+      code: 'INVALID_IDENTITY_DOCUMENT', detail: `The identity document is not valid: ${reason}`,
+    })
+    expect(errorMessage(invalid('EXPIRED'))).toBe('Tu INE ya no está vigente; usa una credencial vigente.')
+    expect(errorMessage(invalid('SOMETHING_NEW'))).toBe('Los datos de la INE no son válidos; revísalos.')
+    expect(errorMessage(new ApiError(409, {
+      code: 'IDENTITY_VERIFICATION_CONFLICT', detail: 'Identity verification conflict: DOCUMENT_IN_USE',
+    }))).toMatch(/ya está registrada en otra cuenta/)
+    expect(errorMessage(new ApiError(422, {
+      code: 'ROLE_CHANGE_BLOCKED', detail: "The account can't become staff yet: BALANCE",
+    }))).toMatch(/todavía tiene saldo/)
   })
 
   it('builds the daily limit message from the numbers in the detail', () => {

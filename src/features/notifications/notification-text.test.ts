@@ -79,6 +79,14 @@ const stored = {
     title: 'Your support case was closed',
     body: 'Tell us how it went: it only takes a moment.',
   },
+  SUPPORT_TICKET_RESOLVED: { title: 'Your case was settled', body: 'Confirmamos el pago con el proveedor y acreditamos el depósito.' },
+  SUPPORT_ESCALATION_RESOLVED: { title: 'A ticket you escalated was settled', body: 'Acreditamos el depósito.' },
+  WALLET_ADJUSTED: { title: 'Money added to your wallet', body: 'We added 250.00 MXN to your wallet: Depósito que no llegó' },
+  IDENTITY_VERIFIED: {
+    title: 'Your identity is verified',
+    body: 'We reviewed your INE and confirmed your identity. You can now withdraw money to your bank accounts.',
+  },
+  IDENTITY_REJECTED: { title: 'We could not verify your identity', body: 'We reviewed your INE and could not verify it: La foto está borrosa' },
   SESSIONS_REVOKED: {
     title: 'Sessions signed out',
     body: "3 of your sessions were signed out. If it wasn't you, change your password right away.",
@@ -173,5 +181,56 @@ describe('notificationTitle', () => {
   it('translates the title of a live event, which has no body', () => {
     expect(notificationTitle('TRANSFER_RECEIVED', 'Money received', 'es')).toBe('Dinero recibido')
     expect(notificationTitle('TRANSFER_RECEIVED', 'Money received', 'en')).toBe('Money received')
+  })
+})
+
+describe('an adjustment to the wallet', () => {
+  it('says how much, which way and why, with what the administrator wrote', () => {
+    expect(spanish('WALLET_ADJUSTED').body).toBe('Abonamos $250.00 MXN a tu billetera: Depósito que no llegó')
+    expect(english('WALLET_ADJUSTED').body).toBe('We added $250.00 MXN to your wallet: Depósito que no llegó')
+    expect(notificationText({ type: 'WALLET_ADJUSTED', title: 'Money taken from your wallet', body: 'We took 10.00 USD from your wallet: Abono duplicado' }, 'es').body)
+      .toBe('Cargamos $10.00 USD a tu billetera: Abono duplicado')
+  })
+
+  it('still reads well when the body is not what the API writes', () => {
+    expect(notificationText({ type: 'WALLET_ADJUSTED', title: 'x', body: 'otro' }, 'es').body).toContain('Hicimos un ajuste')
+  })
+})
+
+describe('a settled support ticket', () => {
+  it('shows what the administrator wrote, inside the sentence of the chosen language', () => {
+    expect(spanish('SUPPORT_TICKET_RESOLVED')).toEqual({
+      title: 'Resolvimos tu caso',
+      body: 'Revisamos lo que reportaste: Confirmamos el pago con el proveedor y acreditamos el depósito.',
+    })
+    expect(english('SUPPORT_TICKET_RESOLVED').body).toBe('We reviewed what you reported: Confirmamos el pago con el proveedor y acreditamos el depósito.')
+  })
+
+  it('still reads well with no resolution stored', () => {
+    expect(notificationText({ type: 'SUPPORT_TICKET_RESOLVED', title: 'Your case was settled', body: '' }, 'es').body)
+      .toBe('Revisamos lo que reportaste. Consulta los detalles en soporte.')
+  })
+
+  it('tells the agent who escalated it what the administrators did', () => {
+    expect(spanish('SUPPORT_ESCALATION_RESOLVED')).toEqual({
+      title: 'Resolvieron un ticket que escalaste',
+      body: 'Administración respondió: Acreditamos el depósito.',
+    })
+    expect(english('SUPPORT_ESCALATION_RESOLVED').body).toBe('The administrators answered: Acreditamos el depósito.')
+  })
+})
+
+describe('a reviewed identity', () => {
+  it('tells the customer why it was rejected, inside the sentence of the chosen language', () => {
+    expect(spanish('IDENTITY_REJECTED')).toEqual({
+      title: 'No pudimos verificar tu identidad',
+      body: 'Revisamos tu INE y no pudimos verificarla: La foto está borrosa',
+    })
+    expect(spanish('IDENTITY_VERIFIED').title).toBe('Tu identidad está verificada')
+  })
+
+  it('still reads well with no reason stored', () => {
+    expect(notificationText({ type: 'IDENTITY_REJECTED', title: 'x', body: '' }, 'es').body)
+      .toBe('Revisamos tu INE y no pudimos verificarla. Revisa el motivo y vuelve a enviarla.')
   })
 })

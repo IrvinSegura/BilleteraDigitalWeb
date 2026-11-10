@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/support/agent/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["availability"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notifications/preferences": {
         parameters: {
             query?: never;
@@ -142,6 +158,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["changePassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/identity-verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["status"];
+        put?: never;
+        post: operations["submit"];
         delete?: never;
         options?: never;
         head?: never;
@@ -292,6 +324,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/support/agent/replies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["replies"];
+        put?: never;
+        post: operations["saveReply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/conversations/{conversationId}/transfer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["transfer_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/conversations/{conversationId}/tickets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["tickets"];
+        put?: never;
+        post: operations["openTicket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/support/agent/conversations/{conversationId}/resolve": {
         parameters: {
             query?: never;
@@ -308,6 +388,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/support/agent/conversations/{conversationId}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/conversations/{conversationId}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["notes"];
+        put?: never;
+        post: operations["addNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/support/agent/conversations/{conversationId}/messages": {
         parameters: {
             query?: never;
@@ -318,6 +430,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["reply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/conversations/{conversationId}/bot-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["suggestToBot"];
         delete?: never;
         options?: never;
         head?: never;
@@ -548,6 +676,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_2"];
+        put?: never;
+        post: operations["createStaff"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/users/{userId}/unlock": {
         parameters: {
             query?: never;
@@ -660,6 +804,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/support/tickets/{ticketId}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resolve_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/support/bot/suggestions/{suggestionId}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["review"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/reconciliations": {
         parameters: {
             query?: never;
@@ -685,7 +861,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["resolve_1"];
+        post: operations["resolve_2"];
         delete?: never;
         options?: never;
         head?: never;
@@ -702,6 +878,86 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["contribute"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/identity-verifications/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/identity-verifications/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/adjustments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_3"];
+        put?: never;
+        post: operations["request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/adjustments/{adjustmentId}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reject_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/adjustments/{adjustmentId}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["approve_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -738,6 +994,22 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["rename"];
+        trace?: never;
+    };
+    "/api/v1/withdrawals/currencies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["currencies"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/wallets/{walletId}": {
@@ -996,6 +1268,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/support/agent/tickets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["myTickets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/support/agent/summary": {
         parameters: {
             query?: never;
@@ -1012,6 +1300,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/support/agent/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["metrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/support/agent/conversations": {
         parameters: {
             query?: never;
@@ -1019,7 +1323,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_2"];
+        get: operations["list_4"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1044,6 +1348,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/support/agent/conversations/{conversationId}/operations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["operations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/conversations/{conversationId}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/conversations/{conversationId}/customer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["customer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/colleagues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["colleagues"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notifications": {
         parameters: {
             query?: never;
@@ -1051,7 +1419,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_3"];
+        get: operations["list_5"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1115,7 +1483,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_4"];
+        get: operations["list_6"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1172,22 +1540,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["list_5"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/admin/users/{userId}": {
         parameters: {
             query?: never;
@@ -1211,7 +1563,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_6"];
+        get: operations["list_7"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1236,6 +1588,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/users/signups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["signups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/transfers/{transferId}": {
         parameters: {
             query?: never;
@@ -1243,7 +1611,39 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["transfer_1"];
+        get: operations["transfer_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/support/tickets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_8"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/support/tickets/{ticketId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_7"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1275,7 +1675,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_7"];
+        get: operations["list_9"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1291,7 +1691,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_7"];
+        get: operations["get_8"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1316,6 +1716,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/support/bot/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["suggestions_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/support/bot/misses": {
         parameters: {
             query?: never;
@@ -1332,6 +1748,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/support/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["agents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/payments/provider-transactions": {
         parameters: {
             query?: never;
@@ -1340,6 +1772,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["transactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/payments/provider-transactions/counts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["counts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1387,7 +1835,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["suggestions_2"];
+        get: operations["suggestions_3"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1412,6 +1860,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/operations/daily": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["daily"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/ledger/system-accounts": {
         parameters: {
             query?: never;
@@ -1420,6 +1884,70 @@ export interface paths {
             cookie?: never;
         };
         get: operations["systemAccounts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ledger/customer-balances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["customerBalances"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/identity-verifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_10"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/identity-verifications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_9"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/identity-verifications/{id}/images/{side}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["image"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1460,6 +1988,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/adjustments/{adjustmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_10"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me/sessions/{sessionId}": {
         parameters: {
             query?: never;
@@ -1471,6 +2015,22 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["revokeSession"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support/agent/replies/{replyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteReply"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1542,8 +2102,25 @@ export interface components {
             status?: string;
             emailVerified?: boolean;
             twoFactorEnabled?: boolean;
+            mustChangePassword?: boolean;
             /** Format: date-time */
             createdAt?: string;
+        };
+        AvailabilityRequest: {
+            available: boolean;
+        };
+        AgentSummary: {
+            /** Format: uuid */
+            activeConversationId?: string;
+            /** Format: int64 */
+            queued?: number;
+            available?: boolean;
+            /** Format: int64 */
+            queuedHighPriority?: number;
+            /** Format: date-time */
+            oldestQueuedAt?: string;
+            /** Format: date-time */
+            lastCustomerMessageAt?: string;
         };
         PreferencesRequest: {
             emailMoneyIn: boolean;
@@ -1641,6 +2218,19 @@ export interface components {
             /** Format: int64 */
             refreshExpiresIn?: number;
         };
+        IdentityVerificationResponse: {
+            /** Format: uuid */
+            id?: string;
+            status?: string;
+            curpLastFour?: string;
+            /** Format: date-time */
+            submittedAt?: string;
+            /** Format: date-time */
+            reviewedAt?: string;
+            rejectionReason?: string;
+            /** Format: int32 */
+            attemptsLeft?: number;
+        };
         ChangeEmailRequest: {
             /** Format: email */
             newEmail: string;
@@ -1709,6 +2299,8 @@ export interface components {
             assignedAt?: string;
             /** Format: date-time */
             resolvedAt?: string;
+            priority?: string;
+            resolution?: string;
             messages?: components["schemas"]["MessageResponse"][];
         };
         MessageResponse: {
@@ -1720,6 +2312,96 @@ export interface components {
             asksFeedback?: boolean;
             suggestions?: string[];
             attachment?: components["schemas"]["AttachmentResponse"];
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        SavedReplyRequest: {
+            title: string;
+            text: string;
+        };
+        SavedReplyResponse: {
+            /** Format: uuid */
+            id?: string;
+            title?: string;
+            text?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        CaseTransferRequest: {
+            /** Format: uuid */
+            agentId: string;
+        };
+        OpenTicketRequest: {
+            /** @enum {string} */
+            category?: "OPERATION" | "ACCOUNT_ACCESS" | "IDENTITY" | "OTHER";
+            /** Format: uuid */
+            operationId?: string;
+            description: string;
+        };
+        OperationResponse: {
+            kind?: string;
+            /** Format: uuid */
+            id?: string;
+            status?: string;
+            amount?: components["schemas"]["MoneyResponse"];
+            reason?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            closedAt?: string;
+        };
+        TicketResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            conversationId?: string;
+            /** Format: uuid */
+            userId?: string;
+            status?: string;
+            category?: string;
+            operationKind?: string;
+            /** Format: uuid */
+            operationId?: string;
+            operation?: components["schemas"]["OperationResponse"];
+            description?: string;
+            openedByName?: string;
+            customerName?: string;
+            customerEmail?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            resolution?: string;
+            resolvedByName?: string;
+            /** Format: date-time */
+            resolvedAt?: string;
+        };
+        CaseResolveRequest: {
+            /** @enum {string} */
+            reason?: "SOLVED" | "INFORMATION" | "TICKET" | "NO_REPLY" | "DUPLICATE" | "CUSTOMER_CLOSED" | "OTHER";
+        };
+        NoteRequest: {
+            text: string;
+        };
+        NoteResponse: {
+            /** Format: uuid */
+            id?: string;
+            authorName?: string;
+            text?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        BotSuggestionRequest: {
+            question: string;
+            answer: string;
+        };
+        BotSuggestionResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            conversationId?: string;
+            language?: string;
+            question?: string;
+            answer?: string;
+            status?: string;
             /** Format: date-time */
             createdAt?: string;
         };
@@ -1780,6 +2462,12 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
         };
+        CreateStaffRequest: {
+            email: string;
+            fullName: string;
+            role: string;
+            reason: string;
+        };
         AdminUserResponse: {
             /** Format: uuid */
             id?: string;
@@ -1816,6 +2504,29 @@ export interface components {
         };
         SearchRequest: {
             email: string;
+        };
+        ResolveTicketRequest: {
+            resolution: string;
+        };
+        ReviewSuggestionRequest: {
+            /** @enum {string} */
+            status: "OPEN" | "ADDED" | "DISMISSED";
+        };
+        AdminBotSuggestionResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            conversationId?: string;
+            agentName?: string;
+            language?: string;
+            question?: string;
+            answer?: string;
+            status?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            reviewedByName?: string;
+            /** Format: date-time */
+            reviewedAt?: string;
         };
         DiscrepancyResponse: {
             kind?: string;
@@ -1885,6 +2596,80 @@ export interface components {
             /** Format: int64 */
             balanceMinor?: number;
         };
+        RejectRequest: {
+            reason: string;
+        };
+        IdentityVerificationDetail: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            userId?: string;
+            userEmail?: string;
+            accountName?: string;
+            status?: string;
+            firstNames?: string;
+            firstSurname?: string;
+            secondSurname?: string;
+            curp?: string;
+            voterKey?: string;
+            cic?: string;
+            citizenId?: string;
+            /** Format: int32 */
+            expiryYear?: number;
+            /** Format: date */
+            birthDate?: string;
+            sex?: string;
+            namesMatchCurp?: boolean;
+            nameMatchesAccount?: boolean;
+            /** Format: date-time */
+            submittedAt?: string;
+            /** Format: date-time */
+            reviewedAt?: string;
+            /** Format: uuid */
+            reviewedBy?: string;
+            rejectionReason?: string;
+        };
+        AdjustmentRequest: {
+            /** Format: uuid */
+            walletId: string;
+            /** @enum {string} */
+            direction: "CREDIT" | "DEBIT";
+            amount: number;
+            reason: string;
+            /** Format: uuid */
+            ticketId?: string;
+        };
+        AdjustmentResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            walletId?: string;
+            /** Format: uuid */
+            userId?: string;
+            customerName?: string;
+            customerEmail?: string;
+            direction?: string;
+            amount?: components["schemas"]["MoneyResponse"];
+            reason?: string;
+            /** Format: uuid */
+            ticketId?: string;
+            status?: string;
+            secondApproval?: boolean;
+            /** Format: uuid */
+            requestedBy?: string;
+            requestedByName?: string;
+            /** Format: date-time */
+            requestedAt?: string;
+            decidedByName?: string;
+            /** Format: date-time */
+            decidedAt?: string;
+            rejectionReason?: string;
+            /** Format: uuid */
+            journalEntryId?: string;
+        };
+        RejectAdjustmentRequest: {
+            reason: string;
+        };
         UpdateProfileRequest: {
             fullName?: string;
             phone?: string;
@@ -1892,8 +2677,15 @@ export interface components {
         RenameBankAccountRequest: {
             alias?: string;
         };
+        WithdrawalCurrenciesResponse: {
+            currencies?: string[];
+        };
         MonthSummaryResponse: {
             month?: string;
+            /** Format: date */
+            from?: string;
+            /** Format: date */
+            to?: string;
             openingBalance?: components["schemas"]["MoneyResponse"];
             moneyIn?: components["schemas"]["MoneyResponse"];
             moneyOut?: components["schemas"]["MoneyResponse"];
@@ -1962,11 +2754,31 @@ export interface components {
             /** Format: int64 */
             timesSent?: number;
         };
-        AgentSummary: {
-            /** Format: uuid */
-            activeConversationId?: string;
+        TicketPageResponse: {
+            items?: components["schemas"]["TicketResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            hasNext?: boolean;
             /** Format: int64 */
-            queued?: number;
+            open?: number;
+        };
+        AgentMetricsResponse: {
+            /** Format: int32 */
+            days?: number;
+            /** Format: int64 */
+            attended?: number;
+            /** Format: int64 */
+            resolved?: number;
+            /** Format: double */
+            firstResponseSeconds?: number;
+            /** Format: double */
+            handleSeconds?: number;
+            /** Format: int64 */
+            surveys?: number;
+            /** Format: double */
+            averageScore?: number;
         };
         ConversationPageResponse: {
             items?: components["schemas"]["ConversationSummaryResponse"][];
@@ -1988,7 +2800,38 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
             /** Format: date-time */
+            escalatedAt?: string;
+            /** Format: date-time */
+            assignedAt?: string;
+            /** Format: date-time */
             resolvedAt?: string;
+            priority?: string;
+            resolution?: string;
+        };
+        CustomerStandingResponse: {
+            status?: string;
+            emailVerified?: boolean;
+            /** Format: date-time */
+            lockedUntil?: string;
+            identityStatus?: string;
+            /** Format: date-time */
+            identitySubmittedAt?: string;
+            identityRejectionReason?: string;
+            identityRequiredForWithdrawals?: boolean;
+            /** Format: date-time */
+            memberSince?: string;
+            wallets?: components["schemas"]["WalletState"][];
+        };
+        WalletState: {
+            currency?: string;
+            frozen?: boolean;
+        };
+        ColleagueResponse: {
+            /** Format: uuid */
+            id?: string;
+            name?: string;
+            busy?: boolean;
+            available?: boolean;
         };
         NotificationPageResponse: {
             items?: components["schemas"]["NotificationResponse"][];
@@ -2090,6 +2933,12 @@ export interface components {
             /** Format: int64 */
             admins?: number;
         };
+        DailySignups: {
+            /** Format: date */
+            date?: string;
+            /** Format: int64 */
+            count?: number;
+        };
         AdminTransferResponse: {
             /** Format: uuid */
             id?: string;
@@ -2122,12 +2971,20 @@ export interface components {
             surveys?: number;
             /** Format: double */
             averageScore?: number;
+            /** Format: int64 */
+            queuedHighPriority?: number;
+            /** Format: date-time */
+            oldestQueuedAt?: string;
+            resolutions?: {
+                [key: string]: number;
+            };
         };
         AdminConversationResponse: {
             conversation?: components["schemas"]["ConversationResponse"];
             /** Format: int32 */
             surveyScore?: number;
             surveyComment?: string;
+            notes?: components["schemas"]["NoteResponse"][];
         };
         BotSummary: {
             /** Format: int64 */
@@ -2146,6 +3003,16 @@ export interface components {
             askedAgain?: number;
             /** Format: int64 */
             notFound?: number;
+        };
+        BotSuggestionPageResponse: {
+            items?: components["schemas"]["AdminBotSuggestionResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            hasNext?: boolean;
+            /** Format: int64 */
+            open?: number;
         };
         BotMissPageResponse: {
             items?: components["schemas"]["BotMissResponse"][];
@@ -2167,6 +3034,20 @@ export interface components {
             lastAskedAt?: string;
             /** Format: uuid */
             conversationId?: string;
+        };
+        AgentReportResponse: {
+            /** Format: uuid */
+            id?: string;
+            name?: string;
+            busy?: boolean;
+            available?: boolean;
+            metrics?: components["schemas"]["AgentMetricsResponse"];
+        };
+        ProviderTransactionCountsResponse: {
+            /** Format: int64 */
+            unmatched?: number;
+            /** Format: int64 */
+            pending?: number;
         };
         BalanceComparisonResponse: {
             currency?: string;
@@ -2210,6 +3091,47 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
         };
+        OperationDailyResponse: {
+            /** Format: date */
+            date?: string;
+            kind?: string;
+            /** Format: int64 */
+            count?: number;
+            amount?: components["schemas"]["MoneyResponse"];
+        };
+        CustomerBalanceResponse: {
+            currency?: string;
+            /** Format: int64 */
+            balanceMinor?: number;
+            /** Format: int64 */
+            accounts?: number;
+        };
+        IdentityVerificationPage: {
+            items?: components["schemas"]["IdentityVerificationSummary"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            hasNext?: boolean;
+            /** Format: int64 */
+            pending?: number;
+        };
+        IdentityVerificationSummary: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            userId?: string;
+            userEmail?: string;
+            userName?: string;
+            status?: string;
+            curpLastFour?: string;
+            namesMatchCurp?: boolean;
+            nameMatchesAccount?: boolean;
+            /** Format: date-time */
+            submittedAt?: string;
+            /** Format: date-time */
+            reviewedAt?: string;
+        };
         AdminDepositResponse: {
             /** Format: uuid */
             id?: string;
@@ -2249,6 +3171,16 @@ export interface components {
             /** Format: int32 */
             size?: number;
             hasNext?: boolean;
+        };
+        AdjustmentPageResponse: {
+            items?: components["schemas"]["AdjustmentResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            hasNext?: boolean;
+            /** Format: int64 */
+            pending?: number;
         };
         RevokedSessionsResponse: {
             /** Format: int32 */
@@ -2300,6 +3232,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["UserResponse"];
+                };
+            };
+        };
+    };
+    availability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AvailabilityRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AgentSummary"];
                 };
             };
         };
@@ -2562,6 +3518,66 @@ export interface operations {
             };
         };
     };
+    status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IdentityVerificationResponse"];
+                };
+            };
+        };
+    };
+    submit: {
+        parameters: {
+            query: {
+                firstNames: string;
+                firstSurname: string;
+                secondSurname?: string;
+                curp: string;
+                voterKey: string;
+                cic: string;
+                citizenId: string;
+                expiryYear: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    front: string;
+                    /** Format: binary */
+                    back: string;
+                    /** Format: binary */
+                    selfie: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IdentityVerificationResponse"];
+                };
+            };
+        };
+    };
     requestEmailChange: {
         parameters: {
             query?: never;
@@ -2767,7 +3783,75 @@ export interface operations {
             };
         };
     };
-    resolve: {
+    replies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SavedReplyResponse"][];
+                };
+            };
+        };
+    };
+    saveReply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavedReplyRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SavedReplyResponse"];
+                };
+            };
+        };
+    };
+    transfer_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaseTransferRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    tickets: {
         parameters: {
             query?: never;
             header?: never;
@@ -2784,7 +3868,127 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    "*/*": components["schemas"]["TicketResponse"][];
+                };
+            };
+        };
+    };
+    openTicket: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpenTicketRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TicketResponse"];
+                };
+            };
+        };
+    };
+    resolve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CaseResolveRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
                     "*/*": components["schemas"]["ConversationResponse"];
+                };
+            };
+        };
+    };
+    release: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    notes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NoteResponse"][];
+                };
+            };
+        };
+    };
+    addNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NoteResponse"][];
                 };
             };
         };
@@ -2811,6 +4015,32 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ConversationResponse"];
+                };
+            };
+        };
+    };
+    suggestToBot: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BotSuggestionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BotSuggestionResponse"];
                 };
             };
         };
@@ -3166,6 +4396,55 @@ export interface operations {
             };
         };
     };
+    list_2: {
+        parameters: {
+            query?: {
+                status?: string;
+                role?: string;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminUserPageResponse"];
+                };
+            };
+        };
+    };
+    createStaff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateStaffRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminUserResponse"];
+                };
+            };
+        };
+    };
     unlock: {
         parameters: {
             query?: never;
@@ -3344,6 +4623,58 @@ export interface operations {
             };
         };
     };
+    resolve_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticketId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveTicketRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TicketResponse"];
+                };
+            };
+        };
+    };
+    review: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suggestionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewSuggestionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminBotSuggestionResponse"];
+                };
+            };
+        };
+    };
     recent: {
         parameters: {
             query?: {
@@ -3386,7 +4717,7 @@ export interface operations {
             };
         };
     };
-    resolve_1: {
+    resolve_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -3433,6 +4764,151 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["SystemAccountResponse"];
+                };
+            };
+        };
+    };
+    reject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IdentityVerificationDetail"];
+                };
+            };
+        };
+    };
+    approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IdentityVerificationDetail"];
+                };
+            };
+        };
+    };
+    list_3: {
+        parameters: {
+            query?: {
+                status?: "PENDING_APPROVAL" | "APPLIED" | "REJECTED";
+                ticketId?: string;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdjustmentPageResponse"];
+                };
+            };
+        };
+    };
+    request: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdjustmentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdjustmentResponse"];
+                };
+            };
+        };
+    };
+    reject_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                adjustmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectAdjustmentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdjustmentResponse"];
+                };
+            };
+        };
+    };
+    approve_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                adjustmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdjustmentResponse"];
                 };
             };
         };
@@ -3527,6 +5003,26 @@ export interface operations {
             };
         };
     };
+    currencies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WithdrawalCurrenciesResponse"];
+                };
+            };
+        };
+    };
     get: {
         parameters: {
             query?: never;
@@ -3576,6 +5072,8 @@ export interface operations {
         parameters: {
             query?: {
                 month?: string;
+                from?: string;
+                to?: string;
             };
             header?: never;
             path: {
@@ -3914,6 +5412,30 @@ export interface operations {
             };
         };
     };
+    myTickets: {
+        parameters: {
+            query?: {
+                status?: "OPEN" | "RESOLVED";
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TicketPageResponse"];
+                };
+            };
+        };
+    };
     summary_1: {
         parameters: {
             query?: never;
@@ -3934,9 +5456,33 @@ export interface operations {
             };
         };
     };
-    list_2: {
+    metrics: {
         parameters: {
             query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AgentMetricsResponse"];
+                };
+            };
+        };
+    };
+    list_4: {
+        parameters: {
+            query?: {
+                status?: "BOT" | "QUEUED" | "ASSIGNED" | "RESOLVED";
+                q?: string;
                 page?: number;
                 size?: number;
             };
@@ -3979,7 +5525,93 @@ export interface operations {
             };
         };
     };
-    list_3: {
+    operations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OperationResponse"][];
+                };
+            };
+        };
+    };
+    history: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConversationSummaryResponse"][];
+                };
+            };
+        };
+    };
+    customer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CustomerStandingResponse"];
+                };
+            };
+        };
+    };
+    colleagues: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ColleagueResponse"][];
+                };
+            };
+        };
+    };
+    list_5: {
         parameters: {
             query?: {
                 unreadOnly?: boolean;
@@ -4065,7 +5697,7 @@ export interface operations {
             };
         };
     };
-    list_4: {
+    list_6: {
         parameters: {
             query?: {
                 status?: string;
@@ -4153,31 +5785,6 @@ export interface operations {
             };
         };
     };
-    list_5: {
-        parameters: {
-            query?: {
-                status?: string;
-                role?: string;
-                page?: number;
-                size?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["AdminUserPageResponse"];
-                };
-            };
-        };
-    };
     get_6: {
         parameters: {
             query?: never;
@@ -4200,7 +5807,7 @@ export interface operations {
             };
         };
     };
-    list_6: {
+    list_7: {
         parameters: {
             query?: never;
             header?: never;
@@ -4242,7 +5849,29 @@ export interface operations {
             };
         };
     };
-    transfer_1: {
+    signups: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DailySignups"][];
+                };
+            };
+        };
+    };
+    transfer_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -4260,6 +5889,52 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AdminTransferResponse"];
+                };
+            };
+        };
+    };
+    list_8: {
+        parameters: {
+            query?: {
+                status?: "OPEN" | "RESOLVED";
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TicketPageResponse"];
+                };
+            };
+        };
+    };
+    get_7: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticketId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TicketResponse"];
                 };
             };
         };
@@ -4284,10 +5959,11 @@ export interface operations {
             };
         };
     };
-    list_7: {
+    list_9: {
         parameters: {
             query?: {
                 status?: "BOT" | "QUEUED" | "ASSIGNED" | "RESOLVED";
+                q?: string;
                 page?: number;
                 size?: number;
             };
@@ -4308,7 +5984,7 @@ export interface operations {
             };
         };
     };
-    get_7: {
+    get_8: {
         parameters: {
             query?: never;
             header?: never;
@@ -4352,6 +6028,30 @@ export interface operations {
             };
         };
     };
+    suggestions_2: {
+        parameters: {
+            query?: {
+                status?: "OPEN" | "ADDED" | "DISMISSED";
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BotSuggestionPageResponse"];
+                };
+            };
+        };
+    };
     botMisses: {
         parameters: {
             query?: {
@@ -4378,6 +6078,28 @@ export interface operations {
             };
         };
     };
+    agents: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AgentReportResponse"][];
+                };
+            };
+        };
+    };
     transactions: {
         parameters: {
             query?: {
@@ -4397,6 +6119,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ProviderTransactionResponse"][];
+                };
+            };
+        };
+    };
+    counts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProviderTransactionCountsResponse"];
                 };
             };
         };
@@ -4443,7 +6185,7 @@ export interface operations {
             };
         };
     };
-    suggestions_2: {
+    suggestions_3: {
         parameters: {
             query: {
                 q: string;
@@ -4489,6 +6231,28 @@ export interface operations {
             };
         };
     };
+    daily: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OperationDailyResponse"][];
+                };
+            };
+        };
+    };
     systemAccounts: {
         parameters: {
             query?: never;
@@ -4505,6 +6269,95 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["SystemAccountResponse"][];
+                };
+            };
+        };
+    };
+    customerBalances: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CustomerBalanceResponse"][];
+                };
+            };
+        };
+    };
+    list_10: {
+        parameters: {
+            query?: {
+                status?: "PENDING_REVIEW" | "VERIFIED" | "REJECTED";
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IdentityVerificationPage"];
+                };
+            };
+        };
+    };
+    get_9: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IdentityVerificationDetail"];
+                };
+            };
+        };
+    };
+    image: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                side: "FRONT" | "BACK" | "SELFIE";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };
@@ -4559,12 +6412,54 @@ export interface operations {
             };
         };
     };
+    get_10: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                adjustmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdjustmentResponse"];
+                };
+            };
+        };
+    };
     revokeSession: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 sessionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteReply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                replyId: string;
             };
             cookie?: never;
         };
