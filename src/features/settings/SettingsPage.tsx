@@ -9,12 +9,11 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { api, unwrap } from '@/api/client'
-import { ApiError, errorMessage, isPasswordRejected } from '@/api/errors'
+import { ApiError, errorMessage } from '@/api/errors'
 import { useAuth, useUser } from '@/auth/auth-context'
 import { FormError } from '@/components/ErrorState'
 import { FormField } from '@/components/FormField'
 import { PageHeader } from '@/components/PageHeader'
-import { PasswordInput, PasswordStrength } from '@/components/PasswordInput'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -28,6 +27,8 @@ import { message } from '@/lib/validation'
 
 import { AccountCard } from './AccountCard'
 import { EmailPreferencesCard } from './EmailPreferencesCard'
+import { ChangePasswordFields, useChangePasswordForm } from './password-form'
+import { IdentityCard } from './IdentityCard'
 import { SessionsCard } from './SessionsCard'
 import { TwoFactorCard } from './TwoFactorCard'
 
@@ -151,36 +152,12 @@ function ProfileCard() {
   )
 }
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, message('validation.currentPassword')),
-  newPassword: z.string().min(12, message('validation.passwordMin', { min: 12 })).max(64, message('validation.maxChars', { max: 64 })),
-  confirm: z.string(),
-})
-  .refine((v) => v.newPassword === v.confirm, { path: ['confirm'], ...message('validation.passwordMismatch') })
-  .refine((v) => v.newPassword !== v.currentPassword, { path: ['newPassword'], ...message('validation.passwordSame') })
-
 function PasswordCard() {
   const { t } = useTranslation()
-  const user = useUser()
-  const { changePassword } = useAuth()
-  const form = useForm({ resolver: zodResolver(passwordSchema), defaultValues: { currentPassword: '', newPassword: '', confirm: '' } })
-  useRetranslateErrors(form)
-  const { errors, isSubmitting } = form.formState
-  const submit = form.handleSubmit(async ({ currentPassword, newPassword }) => {
-    try {
-      await changePassword(currentPassword, newPassword)
-      form.reset()
-      toast.success(t('settings.password.updated'))
-    } catch (caught) {
-      if (caught instanceof ApiError && caught.code === 'INCORRECT_PASSWORD') {
-        form.setError('currentPassword', { message: errorMessage(caught) })
-      } else if (isPasswordRejected(caught)) {
-        form.setError('newPassword', { message: errorMessage(caught) })
-      } else {
-        form.setError('root', { message: errorMessage(caught) })
-      }
-    }
+  const { form, submit } = useChangePasswordForm(() => {
+    toast.success(t('settings.password.updated'))
   })
+  const { errors, isSubmitting } = form.formState
   return (
     <Card>
       <CardHeader>
@@ -189,18 +166,7 @@ function PasswordCard() {
       </CardHeader>
       <form onSubmit={submit} noValidate>
         <CardContent className="grid gap-4">
-          <FormField label={t('common.currentPassword')} error={errors.currentPassword?.message}>
-            {(field) => <PasswordInput {...field} autoComplete="current-password" {...form.register('currentPassword')} />}
-          </FormField>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label={t('common.newPassword')} error={errors.newPassword?.message}>
-              {(field) => <PasswordInput {...field} autoComplete="new-password" {...form.register('newPassword')} />}
-            </FormField>
-            <FormField label={t('settings.password.confirm')} error={errors.confirm?.message}>
-              {(field) => <PasswordInput {...field} autoComplete="new-password" {...form.register('confirm')} />}
-            </FormField>
-          </div>
-          <PasswordStrength password={form.watch('newPassword')} personal={[user.email, user.fullName]} />
+          <ChangePasswordFields form={form} />
           <FormError message={errors.root?.message} />
         </CardContent>
         <CardFooter className="mt-4 justify-end">
@@ -215,6 +181,7 @@ function PasswordCard() {
 
 export function SettingsPage() {
   const { t } = useTranslation()
+  const user = useUser()
   const { hash } = useLocation()
   // /settings#security (from the account menu) scrolls to the security section
   useEffect(() => {
@@ -229,8 +196,9 @@ export function SettingsPage() {
       <div className="grid gap-6 lg:grid-cols-[22rem_1fr]">
         <div className="space-y-6">
           <ProfileCard />
+          {/* Only customers move money out, so only they verify an identity */}
+          {user.role === 'USER' && <IdentityCard />}
           <EmailPreferencesCard />
-          <AccountCard />
         </div>
         <section id="security" className="scroll-mt-24 space-y-6">
           <TwoFactorCard />
@@ -238,6 +206,7 @@ export function SettingsPage() {
           <PasswordCard />
         </section>
       </div>
+      <div className="pt-4"><AccountCard /></div>
     </div>
   )
 }
