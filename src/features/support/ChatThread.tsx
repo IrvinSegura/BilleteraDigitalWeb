@@ -240,7 +240,7 @@ export function ChatThread({ conversation, reader, intro, quickQuestions, onQues
 
   return (
     <div ref={log} role="log" aria-label={t('support.threadLabel')} tabIndex={0}
-      className={cn('overflow-y-auto p-4 outline-none sm:p-5', className ?? 'max-h-[60svh] min-h-64 flex-1')}>
+      className={cn('scrollbar-thin overflow-y-auto p-4 outline-none sm:p-5', className ?? 'max-h-[60svh] min-h-64 flex-1')}>
       <ol className="flex flex-col gap-4">
         {intro && (
           <li className="flex gap-2.5">

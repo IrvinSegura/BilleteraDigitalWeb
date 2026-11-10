@@ -1,5 +1,5 @@
 import { Loader2, Paperclip, Send } from 'lucide-react'
-import { type FormEvent, type KeyboardEvent, useLayoutEffect, useRef, useState } from 'react'
+import { type FormEvent, type KeyboardEvent, type ReactNode, useLayoutEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { FormError } from '@/components/ErrorState'
@@ -11,12 +11,14 @@ import { ACCEPTED_FILES, MAX_FILE_BYTES, MAX_TEXT_LENGTH } from './support-api'
 const MARKUP = /[<>]/
 
 /** Where a message is written, or a file picked, in any chat. Empties itself once what it sent arrives. */
-export function ChatComposer({ placeholder, pending, error, onSend, onAttach }: {
+export function ChatComposer({ placeholder, pending, error, onSend, onAttach, tools }: {
   placeholder: string
   pending: boolean
   error?: string | null
   onSend: (text: string) => Promise<unknown>
   onAttach: (file: File, text: string) => Promise<unknown>
+  /** More buttons beside the attachment's, which can read what is written and add to it. */
+  tools?: (draft: string, insert: (text: string) => void) => ReactNode
 }) {
   const { t } = useTranslation()
   const [text, setText] = useState('')
@@ -32,6 +34,12 @@ export function ChatComposer({ placeholder, pending, error, onSend, onAttach }: 
       box.current.style.height = `${box.current.scrollHeight}px`
     }
   }, [text])
+
+  function insert(addition: string) {
+    setText((current) => (current.trim() ? `${current.trimEnd()} ${addition}` : addition).slice(0, MAX_TEXT_LENGTH))
+    setProblem(null)
+    box.current?.focus()
+  }
 
   function hasMarkup() {
     if (MARKUP.test(text)) {
@@ -85,6 +93,7 @@ export function ChatComposer({ placeholder, pending, error, onSend, onAttach }: 
           aria-label={t('support.attach')} title={t('support.attachHint')} onClick={() => picker.current?.click()}>
           <Paperclip />
         </Button>
+        {tools?.(text, insert)}
         <textarea ref={box} rows={1} value={text} maxLength={MAX_TEXT_LENGTH} placeholder={placeholder} aria-label={t('support.message')}
           onChange={(event) => { setText(event.target.value); setProblem(null) }} onKeyDown={sendOnEnter}
           className="max-h-32 min-h-9 flex-1 resize-none bg-transparent px-1 py-2 text-sm leading-5 outline-none placeholder:text-muted-foreground" />
