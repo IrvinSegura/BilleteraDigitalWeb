@@ -3,7 +3,8 @@ import type { Page } from '@playwright/test'
 import { apiCall, createUser, mxnWallet, type TestUser } from './support/api'
 import { promoteToAdmin } from './support/db'
 import { expect, test, waitOutRateLimits } from './support/fixtures'
-import { signIn } from './support/ui'
+import { emailedText } from './support/mailpit'
+import { signIn, submitSignIn } from './support/ui'
 
 // The administration console as a support person uses it: find a customer, freeze and unfreeze their wallet,
 // disable and enable the account, and see it all in the audit log. One admin session for the whole story.
@@ -19,7 +20,7 @@ test.beforeAll(async ({ browser }) => {
   promoteToAdmin(admin.email)
   page = await browser.newPage()
   await waitOutRateLimits(page)
-  await signIn(page, admin)
+  await signIn(page, admin, '/admin')
 })
 
 test.afterAll(async () => {
@@ -89,7 +90,8 @@ test('browses the accounts by role, and the list survives opening one', async ()
   await expect(page.getByRole('heading', { level: 1, name: 'Usuarios' })).toBeVisible()
   await expect(page.getByLabel('Resumen de cuentas').getByText('Administradores')).toBeVisible()
 
-  await page.getByRole('group', { name: 'Rol' }).getByRole('button', { name: 'Administrador' }).click()
+  await page.getByRole('combobox', { name: 'Tipo de usuario' }).click()
+  await page.getByRole('option', { name: 'Administrador' }).click()
   await expect(page).toHaveURL('/admin/users?role=ADMIN')
   // Every test administrator has this name, and the newest comes first
   await expect(page.getByRole('link', { name: admin.fullName }).first()).toBeVisible()
@@ -99,7 +101,44 @@ test('browses the accounts by role, and the list survives opening one', async ()
   await expect(page).toHaveURL(/\/admin\/users\/[0-9a-f-]{36}$/)
   await page.goBack()
   await expect(page).toHaveURL('/admin/users?role=ADMIN')
-  await expect(page.getByRole('group', { name: 'Rol' }).getByRole('button', { name: 'Administrador' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByRole('combobox', { name: 'Tipo de usuario' })).toHaveText('Administrador')
+})
+
+test('creates an agent, who gets their data by email and has to replace the password to get in', async ({ browser }) => {
+  const email = `e2e-generated-${Date.now()}@wallet.local`
+  await page.locator('a[href="/admin/users"]').first().click()
+  await page.getByRole('button', { name: 'Crear nuevo admin/soporte' }).click()
+  const form = page.getByRole('dialog')
+  await form.getByLabel('Nombre completo').fill('Agente Generado')
+  await form.getByLabel('Correo de trabajo').fill(email)
+  await form.getByLabel('Motivo').fill('Nuevo ingreso')
+  await form.getByRole('button', { name: 'Crear nuevo soporte' }).click()
+
+  await expect(page).toHaveURL(/\/admin\/users\/[0-9a-f-]{36}$/)
+  await expect(page.getByText(/Enviamos sus datos de acceso/)).toBeVisible()
+
+  const text = await emailedText(email, 'Tus datos de acceso')
+  expect(text).toContain('Rol: Soporte')
+  expect(text).toContain(`Correo: ${email}`)
+  const password = /Contraseña: (\S+)/.exec(text)?.[1]
+  expect(password).toBeTruthy()
+
+  const agentPage = await browser.newPage()
+  await waitOutRateLimits(agentPage)
+  await submitSignIn(agentPage, { email, password: password! } as TestUser)
+  await expect(agentPage).toHaveURL('/change-password')
+
+  // Nothing else opens until then
+  await agentPage.goto('/support/inbox')
+  await expect(agentPage).toHaveURL('/change-password')
+
+  await agentPage.getByLabel('Contraseña del correo', { exact: true }).fill(password!)
+  await agentPage.getByLabel('Nueva contraseña', { exact: true }).fill('Agente-Con-Clave-Propia-26!')
+  await agentPage.getByLabel('Confírmala', { exact: true }).fill('Agente-Con-Clave-Propia-26!')
+  await agentPage.getByRole('button', { name: 'Guardar y continuar' }).click()
+
+  await expect(agentPage).toHaveURL('/support/inbox')
+  await agentPage.close()
 })
 
 test('browses the wallets by status and reaches the owner of one', async () => {
