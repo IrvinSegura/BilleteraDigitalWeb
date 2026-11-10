@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { Schemas } from '@/api/client'
+import { useCanWithdraw } from '@/api/queries'
 import { useMoneyActions } from '@/features/money/MoneyActions'
 import { formatMoney } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -23,6 +24,7 @@ export function BalanceCard({ wallet, children }: { wallet: Schemas['WalletRespo
   const { open } = useMoneyActions()
   const [hidden, setHidden] = useState(readHidden)
   const frozen = wallet.status === 'FROZEN'
+  const canWithdraw = useCanWithdraw()
 
   function toggle() {
     setHidden((h) => {
@@ -40,7 +42,7 @@ export function BalanceCard({ wallet, children }: { wallet: Schemas['WalletRespo
     { label: t('wallets.actions.send'), icon: Send, action: 'transfer' as const },
     { label: t('wallets.actions.withdraw'), icon: Landmark, action: 'withdraw' as const },
     { label: t('wallets.actions.request'), icon: QrCode, action: 'request' as const },
-  ]
+  ].filter((a) => a.action !== 'withdraw' || canWithdraw(wallet.balance?.currency))
 
   return (
     <div className="brand-surface relative overflow-hidden rounded-3xl p-6 text-white shadow-xl shadow-indigo-950/20 sm:p-8">
@@ -71,7 +73,7 @@ export function BalanceCard({ wallet, children }: { wallet: Schemas['WalletRespo
           </div>
         </div>
         {children}
-        <div className="grid grid-cols-4 gap-2 sm:flex sm:gap-3">
+        <div className={cn('grid gap-2 sm:flex sm:gap-3', actions.length === 4 ? 'grid-cols-4' : 'grid-cols-3')}>
           {actions.map((a) => (
             <button
               key={a.action}

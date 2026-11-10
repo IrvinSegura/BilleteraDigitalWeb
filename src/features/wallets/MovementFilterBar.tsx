@@ -81,10 +81,13 @@ export function countActive(filters: MovementFilters): number {
 
 /**
  * Filters for a wallet's movements, and the statement of the period they pick (the current month by default)
- * as CSV or as a printable page.
+ * as CSV or as a printable page. Dates go from the day the wallet was opened to today, and the end can't come before
+ * the start.
  */
-export function MovementFilterBar({ walletId, filters, onChange }: {
+export function MovementFilterBar({ walletId, openedAt, filters, onChange }: {
   walletId: string
+  /** When the wallet was opened: nothing happened in it before. */
+  openedAt?: string
   filters: MovementFilters
   onChange: (filters: MovementFilters) => void
 }) {
@@ -104,6 +107,19 @@ export function MovementFilterBar({ walletId, filters, onChange }: {
   const [search, setSearch] = useState(filters.q ?? '')
   const [downloading, setDownloading] = useState(false)
   const invalidPeriod = !!filters.from && !!filters.to && filters.from > filters.to
+  const firstDay = openedAt ? new Date(openedAt).toLocaleDateString('en-CA') : undefined
+
+  // A date typed by hand gets the same bounds as the picker: never before the wallet existed nor after today
+  function changeDate(end: 'from' | 'to', value: string) {
+    let day = value || undefined
+    if (day && firstDay && day < firstDay) {
+      day = firstDay
+    }
+    if (day && day > today()) {
+      day = today()
+    }
+    onChange({ ...filters, [end]: day })
+  }
 
   // The search waits for a pause in typing, so each keystroke doesn't fetch a page
   useEffect(() => {
@@ -114,7 +130,8 @@ export function MovementFilterBar({ walletId, filters, onChange }: {
   }, [search, filters, onChange])
 
   async function downloadCsv() {
-    const from = filters.from ?? `${currentMonth()}-01`
+    const monthStart = `${currentMonth()}-01`
+    const from = filters.from ?? (firstDay && firstDay > monthStart ? firstDay : monthStart)
     const to = filters.to ?? today()
     if (from > to || daysBetween(from, to) >= MAX_STATEMENT_DAYS) {
       toast.error(t('wallets.filters.periodTooLong'))
@@ -164,7 +181,8 @@ export function MovementFilterBar({ walletId, filters, onChange }: {
             title={t('wallets.filters.csvHint')}>
             {downloading ? <Loader2 className="animate-spin" /> : <Download />} CSV
           </Button>
-          <Link to={`/wallets/${walletId}/statement?month=${(filters.from ?? today()).slice(0, 7)}`}
+          <Link to={`/wallets/${walletId}/statement?${filters.from && filters.to && !invalidPeriod
+            ? new URLSearchParams({ from: filters.from, to: filters.to }) : `month=${(filters.from ?? today()).slice(0, 7)}`}`}
             className={buttonVariants({ variant: 'outline', size: 'sm' })}>
             <FileText /> {t('wallets.filters.statement')}
           </Link>
@@ -181,13 +199,13 @@ export function MovementFilterBar({ walletId, filters, onChange }: {
           <div className="grid gap-2 sm:grid-cols-[1fr_1fr_1.4fr]">
             <label className="grid gap-1 text-xs text-muted-foreground">
               {t('common.from')}
-              <Input type="date" value={filters.from ?? ''} max={today()} aria-invalid={invalidPeriod || undefined}
-                onChange={(event) => onChange({ ...filters, from: event.target.value || undefined })} />
+              <Input type="date" value={filters.from ?? ''} min={firstDay} max={filters.to ?? today()}
+                aria-invalid={invalidPeriod || undefined} onChange={(event) => changeDate('from', event.target.value)} />
             </label>
             <label className="grid gap-1 text-xs text-muted-foreground">
               {t('wallets.filters.to')}
-              <Input type="date" value={filters.to ?? ''} max={today()} aria-invalid={invalidPeriod || undefined}
-                onChange={(event) => onChange({ ...filters, to: event.target.value || undefined })} />
+              <Input type="date" value={filters.to ?? ''} min={filters.from ?? firstDay} max={today()}
+                aria-invalid={invalidPeriod || undefined} onChange={(event) => changeDate('to', event.target.value)} />
             </label>
             <label className="grid gap-1 text-xs text-muted-foreground">
               {t('common.search')}

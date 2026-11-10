@@ -6,10 +6,10 @@ import { errorMessage } from '@/api/errors'
 import { useUser } from '@/auth/auth-context'
 import { saveFile } from '@/lib/download'
 
-import { fetchWalletStatement, type WalletStatement } from './statement-data'
+import { fetchWalletStatement, type Period, type WalletStatement } from './statement-data'
 
 export interface StatementRequest {
-  month: string
+  period: Period
   /** The wallets it covers, read from the API when the request doesn't already bring their statements. */
   wallets: { id: string; currency: string }[]
   general: boolean
@@ -25,13 +25,13 @@ export function useStatementDownload() {
     mutationFn: async (request: StatementRequest) => {
       const [statements, pdf] = await Promise.all([
         request.statements
-          ?? Promise.all(request.wallets.map((wallet) => fetchWalletStatement(wallet.id, wallet.currency, request.month))),
+          ?? Promise.all(request.wallets.map((wallet) => fetchWalletStatement(wallet.id, wallet.currency, request.period))),
         // The PDF libraries start loading while the movements are read
         import('./statement-pdf'),
       ])
       const document = {
         holder: { fullName: user.fullName ?? '', email: user.email ?? '' },
-        month: request.month,
+        period: request.period,
         wallets: statements,
         general: request.general,
       }

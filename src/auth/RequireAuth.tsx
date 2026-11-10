@@ -6,6 +6,7 @@ import { LogoMark } from '@/components/Logo'
 import { Button } from '@/components/ui/button'
 
 import { useAuth } from './auth-context'
+import { homeOf, isStaff } from './roles'
 
 export function FullPageLoader() {
   const { t } = useTranslation()
@@ -39,9 +40,12 @@ interface ReturnPage {
   forUser?: string
 }
 
+const CHANGE_PASSWORD = '/change-password'
+
 /**
  * Routes behind it need a session; while it's being restored, nothing flashes. Signed-out users go to /login,
- * which sends them back to the page they asked for.
+ * which sends them back to the page they asked for. An account that still has its emailed password goes nowhere until
+ * it replaces it; the API refuses it anyway.
  */
 export function RequireAuth() {
   const { state } = useAuth()
@@ -56,6 +60,18 @@ export function RequireAuth() {
   if (state.status === 'signed-out') {
     const returnPage: ReturnPage = { from: location.pathname + location.search, forUser: state.previousUserId }
     return <Navigate to="/login" replace state={returnPage} />
+  }
+  if (state.user.mustChangePassword && location.pathname !== CHANGE_PASSWORD) {
+    return <Navigate to={CHANGE_PASSWORD} replace />
+  }
+  return <Outlet />
+}
+
+/** Customer screens (money, statements, the support chat); staff are sent to their console. */
+export function RequireCustomer() {
+  const { state } = useAuth()
+  if (state.status === 'signed-in' && isStaff(state.user.role)) {
+    return <Navigate to={homeOf(state.user.role)} replace />
   }
   return <Outlet />
 }

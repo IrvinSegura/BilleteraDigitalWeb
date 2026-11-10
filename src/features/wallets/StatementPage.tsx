@@ -10,37 +10,43 @@ import { currencyName } from '@/components/CurrencyIcon'
 import { PrintDocument, PrintFields, PrintSection } from '@/components/PrintDocument'
 import { Skeleton } from '@/components/Skeleton'
 import { Button, buttonVariants } from '@/components/ui/button'
-import { fetchMonthMovements, lastDay, MONTH, shiftMonth } from '@/features/statements/statement-data'
+import {
+  fetchPeriodMovements, lastDay, localDay, monthOf, monthPeriod, type Period, periodFromParams, periodSlug, periodTitle, shiftMonth,
+} from '@/features/statements/statement-data'
 import { useStatementDownload } from '@/features/statements/use-statement-download'
-import { formatCalendarDate, formatDateTime, formatMoney, formatMonth, shortId } from '@/lib/format'
+import { formatCalendarDate, formatDateTime, formatMoney, shortId } from '@/lib/format'
 import { movementLabel } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 
-import { currentMonth } from './MovementFilterBar'
+import { currentMonth, today } from './MovementFilterBar'
 
-function useMonthMovements(walletId: string, month: string) {
+function usePeriodMovements(walletId: string, period: Period) {
   return useQuery({
-    queryKey: ['wallets', walletId, 'statement', month],
-    queryFn: () => fetchMonthMovements(walletId, month),
+    queryKey: ['wallets', walletId, 'statement', period.from, period.to],
+    queryFn: () => fetchPeriodMovements(walletId, period),
   })
 }
 
-/** A month's statement of one wallet, laid out to print, and to download as a PDF file. */
+/**
+ * One wallet's statement for a month or the days picked on the statements page, laid out to print, and to download
+ * as a PDF file. Months before the wallet was opened aren't offered.
+ */
 export function StatementPage() {
   const { t } = useTranslation()
   const { walletId = '' } = useParams()
   const [params, setParams] = useSearchParams()
-  const month = MONTH.test(params.get('month') ?? '') ? params.get('month')! : currentMonth()
   const user = useUser()
   const wallet = useWallet(walletId)
-  const summary = useWalletSummary(walletId, month)
-  const movements = useMonthMovements(walletId, month)
-  const title = formatMonth(month)
+  const opened = wallet.data?.createdAt ? localDay(wallet.data.createdAt) : undefined
+  const period = periodFromParams(params, monthPeriod(currentMonth()), opened, today())
+  const month = monthOf(period)
+  const summary = useWalletSummary(walletId, period)
+  const movements = usePeriodMovements(walletId, period)
   const error = wallet.error ?? summary.error ?? movements.error
   const currency = wallet.data?.balance?.currency
-  const heading = title.charAt(0).toUpperCase() + title.slice(1)
+  const heading = periodTitle(period)
   const download = useStatementDownload()
-  const period = t('wallets.statement.period', { from: formatCalendarDate(`${month}-01`), to: formatCalendarDate(lastDay(month)) })
+  const range = t('wallets.statement.period', { from: formatCalendarDate(period.from), to: formatCalendarDate(period.to) })
 
   return (
     <div className="min-h-dvh bg-muted/40 pb-8 print:min-h-0 print:bg-white print:pb-0">
@@ -49,21 +55,27 @@ export function StatementPage() {
           <ArrowLeft /> {t('common.back')}
         </Link>
         <div className="ml-auto flex items-center gap-1">
-          <Button variant="outline" size="icon-sm" aria-label={t('wallets.statement.previousMonth')} onClick={() => setParams({ month: shiftMonth(month, -1) })}>
-            <ChevronLeft />
-          </Button>
-          <span className="min-w-36 text-center text-sm font-medium capitalize">{title}</span>
-          <Button variant="outline" size="icon-sm" aria-label={t('wallets.statement.nextMonth')} disabled={month >= currentMonth()}
-            onClick={() => setParams({ month: shiftMonth(month, 1) })}>
-            <ChevronRight />
-          </Button>
+          {month ? (
+            <>
+              <Button variant="outline" size="icon-sm" aria-label={t('wallets.statement.previousMonth')}
+                disabled={!!opened && lastDay(shiftMonth(month, -1)) < opened}
+                onClick={() => setParams({ month: shiftMonth(month, -1) })}>
+                <ChevronLeft />
+              </Button>
+              <span className="min-w-36 text-center text-sm font-medium">{heading}</span>
+              <Button variant="outline" size="icon-sm" aria-label={t('wallets.statement.nextMonth')} disabled={month >= currentMonth()}
+                onClick={() => setParams({ month: shiftMonth(month, 1) })}>
+                <ChevronRight />
+              </Button>
+            </>
+          ) : <span className="text-sm font-medium">{heading}</span>}
         </div>
         <Button variant="outline" size="sm" onClick={() => window.print()} disabled={movements.isPending}>
           <Printer /> {t('wallets.statement.print')}
         </Button>
         <Button size="sm" disabled={!currency || !summary.data || !movements.data || download.isPending}
           onClick={() => download.mutate({
-            month, general: false, wallets: [{ id: walletId, currency: currency! }],
+            period, general: false, wallets: [{ id: walletId, currency: currency! }],
             statements: [{
               walletId, currency: currency!, ...summary.data!, movements: movements.data!.items, cut: movements.data!.cut,
             }],
@@ -77,8 +89,9 @@ export function StatementPage() {
           <PrintDocument
             kind={t('wallets.statement.kind')}
             reference={heading}
-            date={period}
-            fileName={currency ? t('wallets.statement.fileName', { currency, month }) : t('wallets.statement.fileNameNoCurrency', { month })}
+            date={range}
+            fileName={currency ? t('wallets.statement.fileName', { currency, month: periodSlug(period) })
+              : t('wallets.statement.fileNameNoCurrency', { month: periodSlug(period) })}
             legal={t('wallets.statement.legal', { currency: currency ?? t('wallets.statement.walletCurrency') })}
           >
             <PrintSection title={t('wallets.statement.accountData')}>

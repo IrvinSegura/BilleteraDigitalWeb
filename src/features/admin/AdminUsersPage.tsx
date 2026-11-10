@@ -8,13 +8,14 @@ import { api, type Schemas, unwrap } from '@/api/client'
 import { errorMessage, hasCode } from '@/api/errors'
 import { EmptyState } from '@/components/EmptyState'
 import { FormError } from '@/components/ErrorState'
+import { FormField } from '@/components/FormField'
 import { PageHeader } from '@/components/PageHeader'
 import { Pager } from '@/components/Pager'
-import { SegmentedControl } from '@/components/SegmentedControl'
 import { ListSkeleton, Skeleton } from '@/components/Skeleton'
 import { StatusBadge } from '@/components/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Select } from '@/components/ui/select'
 import { SuggestInput } from '@/components/SuggestInput'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Avatar } from '@/layouts/UserMenu'
@@ -22,12 +23,16 @@ import { formatDate, formatDateTime, formatMoney } from '@/lib/format'
 import { labelOf, userStatus, walletStatus } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 
+import { CreateStaffDialog } from './CreateStaffDialog'
+import { AdjustmentDialog } from './AdjustmentDialog'
 import { AdminError, AdminStats, BooleanPill, DetailGrid, IdCell, ReasonAction, useListParams, useUserSuggestions } from './shared'
 
 type AdminUser = Schemas['AdminUserResponse']
 
 const PAGE_SIZE = 20
 const FILTERS = { status: ['ACTIVE', 'DISABLED', 'CLOSED'], role: ['USER', 'SUPPORT', 'ADMIN'] } as const
+// A select needs a value for "no filter": the address simply leaves the filter out
+const ALL = 'ALL'
 
 function SearchBox() {
   const { t } = useTranslation()
@@ -104,19 +109,22 @@ function UserWallets({ userId }: { userId: string }) {
                   <TableCell><StatusBadge value={w.status} map={walletStatus} /></TableCell>
                   <TableCell className="hidden text-muted-foreground md:table-cell">{formatDate(w.createdAt)}</TableCell>
                   <TableCell className="pr-5 text-right">
-                    <ReasonAction
-                      trigger={frozen ? <><Sun /> {t('admin.users.unfreeze')}</> : <><Snowflake /> {t('admin.users.freeze')}</>}
-                      title={t(frozen ? 'admin.users.unfreezeTitle' : 'admin.users.freezeTitle')}
-                      description={t(frozen ? 'admin.users.unfreezeHint' : 'admin.users.freezeHint')}
-                      confirmLabel={t(frozen ? 'admin.users.unfreeze' : 'admin.users.freeze')}
-                      destructive={!frozen}
-                      onConfirm={async (reason) => {
-                        await unwrap(frozen
-                          ? api.POST('/api/v1/admin/wallets/{walletId}/unfreeze', { ...path, body: { reason } })
-                          : api.POST('/api/v1/admin/wallets/{walletId}/freeze', { ...path, body: { reason } }))
-                        await refresh()
-                      }}
-                    />
+                    <span className="inline-flex flex-wrap justify-end gap-2">
+                      <AdjustmentDialog userId={userId} walletId={w.id} />
+                      <ReasonAction
+                        trigger={frozen ? <><Sun /> {t('admin.users.unfreeze')}</> : <><Snowflake /> {t('admin.users.freeze')}</>}
+                        title={t(frozen ? 'admin.users.unfreezeTitle' : 'admin.users.freezeTitle')}
+                        description={t(frozen ? 'admin.users.unfreezeHint' : 'admin.users.freezeHint')}
+                        confirmLabel={t(frozen ? 'admin.users.unfreeze' : 'admin.users.freeze')}
+                        destructive={!frozen}
+                        onConfirm={async (reason) => {
+                          await unwrap(frozen
+                            ? api.POST('/api/v1/admin/wallets/{walletId}/unfreeze', { ...path, body: { reason } })
+                            : api.POST('/api/v1/admin/wallets/{walletId}/freeze', { ...path, body: { reason } }))
+                          await refresh()
+                        }}
+                      />
+                    </span>
                   </TableCell>
                 </TableRow>
               )
@@ -248,19 +256,29 @@ function UserList() {
         { label: t('admin.users.unverifiedCount'), value: stats.data?.unverified, tone: 'warning' },
         { label: t('admin.users.adminsCount'), value: stats.data?.admins },
       ]} />
-      <div className="flex flex-wrap gap-2">
-        <SegmentedControl label={t('admin.users.statusFilter')} value={status} onChange={(next) => setFilter('status', next)} options={[
-          { value: '', label: t('admin.users.allStatuses') },
-          { value: 'ACTIVE', label: t('labels.userStatus.ACTIVE') },
-          { value: 'DISABLED', label: t('labels.userStatus.DISABLED') },
-          { value: 'CLOSED', label: t('labels.userStatus.CLOSED') },
-        ]} />
-        <SegmentedControl label={t('admin.users.roleFilter')} value={role} onChange={(next) => setFilter('role', next)} options={[
-          { value: '', label: t('admin.users.allRoles') },
-          { value: 'USER', label: t('labels.roles.USER') },
-          { value: 'SUPPORT', label: t('labels.roles.SUPPORT') },
-          { value: 'ADMIN', label: t('labels.roles.ADMIN') },
-        ]} />
+      <div className="grid gap-3 sm:grid-cols-[repeat(2,minmax(0,16rem))]">
+        <FormField label={t('admin.users.statusFilter')}>
+          {(field) => (
+            <Select {...field} aria-label={t('admin.users.statusFilter')} value={status || ALL}
+              onValueChange={(next) => setFilter('status', next === ALL ? '' : next)} options={[
+                { value: ALL, label: t('admin.users.allStatuses') },
+                { value: 'ACTIVE', label: t('admin.users.statusOptions.ACTIVE') },
+                { value: 'DISABLED', label: t('admin.users.statusOptions.DISABLED') },
+                { value: 'CLOSED', label: t('admin.users.statusOptions.CLOSED') },
+              ]} />
+          )}
+        </FormField>
+        <FormField label={t('admin.users.roleFilter')}>
+          {(field) => (
+            <Select {...field} aria-label={t('admin.users.roleFilter')} value={role || ALL}
+              onValueChange={(next) => setFilter('role', next === ALL ? '' : next)} options={[
+                { value: ALL, label: t('admin.users.allRoles') },
+                { value: 'USER', label: t('labels.roles.USER') },
+                { value: 'SUPPORT', label: t('labels.roles.SUPPORT') },
+                { value: 'ADMIN', label: t('labels.roles.ADMIN') },
+              ]} />
+          )}
+        </FormField>
       </div>
       {users.isError ? <AdminError error={users.error} onRetry={() => users.refetch()} /> : (
         <Card className="gap-0 py-0">
@@ -311,7 +329,7 @@ export function AdminUsersPage() {
   const { userId } = useParams()
   return (
     <div className="space-y-6">
-      <PageHeader title={t('admin.users.title')} description={t('admin.users.description')} />
+      <PageHeader title={t('admin.users.title')} description={t('admin.users.description')} actions={<CreateStaffDialog />} />
       <Card><CardContent><SearchBox /></CardContent></Card>
       {userId ? (
         <>

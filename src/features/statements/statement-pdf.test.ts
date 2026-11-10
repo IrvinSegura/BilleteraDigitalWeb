@@ -20,6 +20,8 @@ const statement = (walletId: string, currency: string, movements = 0): WalletSta
   cut: false,
 })
 const holder = { fullName: 'Ana López', email: 'ana@example.com' }
+const october = { from: '2026-10-01', to: '2026-10-31' }
+const quarter = { from: '2026-09-01', to: '2026-11-06' }
 
 describe('pdfText', () => {
   it('turns the spaces and minus sign Intl writes into ones the PDF fonts have', () => {
@@ -37,21 +39,27 @@ describe('pdfText', () => {
 
 describe('statement references', () => {
   it('names one wallet by its short id and the general one as such', () => {
-    expect(statementFolio('2026-10', [statement('7f3e2a10-aaaa-bbbb', 'MXN')], false)).toBe('EC-202610-7F3E2A10')
-    expect(statementFolio('2026-10', [statement('a', 'MXN'), statement('b', 'USD')], true)).toBe('EC-202610-GEN')
+    expect(statementFolio(october, [statement('7f3e2a10-aaaa-bbbb', 'MXN')], false)).toBe('EC-202610-7F3E2A10')
+    expect(statementFolio(october, [statement('a', 'MXN'), statement('b', 'USD')], true)).toBe('EC-202610-GEN')
+  })
+
+  it('names a period of days by its first and last day', () => {
+    expect(statementFolio(quarter, [statement('a', 'MXN'), statement('b', 'USD')], true)).toBe('EC-20260901-20261106-GEN')
+    expect(statementFileName({ holder, period: quarter, general: false, wallets: [statement('a', 'MXN')] }))
+      .toBe('estado-de-cuenta-mxn-2026-09-01_2026-11-06.pdf')
   })
 
   it('names the file after the currency, or as the general statement', () => {
-    expect(statementFileName({ holder, month: '2026-10', general: false, wallets: [statement('a', 'USD')] }))
+    expect(statementFileName({ holder, period: october, general: false, wallets: [statement('a', 'USD')] }))
       .toBe('estado-de-cuenta-usd-2026-10.pdf')
-    expect(statementFileName({ holder, month: '2026-10', general: true, wallets: [statement('a', 'USD')] }))
+    expect(statementFileName({ holder, period: october, general: true, wallets: [statement('a', 'USD')] }))
       .toBe('estado-de-cuenta-general-2026-10.pdf')
   })
 })
 
 describe('buildStatementPdf', () => {
   it('builds a PDF of one wallet, long enough to need several pages', async () => {
-    const pdf = await buildStatementPdf({ holder, month: '2026-10', general: false, wallets: [statement('a', 'MXN', 80)] })
+    const pdf = await buildStatementPdf({ holder, period: october, general: false, wallets: [statement('a', 'MXN', 80)] })
 
     expect(pdf.type).toBe('application/pdf')
     const bytes = new Uint8Array(await pdf.arrayBuffer())
@@ -61,7 +69,7 @@ describe('buildStatementPdf', () => {
 
   it('builds the general one, with wallets that moved nothing too', async () => {
     const pdf = await buildStatementPdf({
-      holder, month: '2026-10', general: true, wallets: [statement('a', 'MXN', 3), statement('b', 'USD')],
+      holder, period: october, general: true, wallets: [statement('a', 'MXN', 3), statement('b', 'USD')],
     })
 
     expect(new TextDecoder('latin1').decode(new Uint8Array(await pdf.arrayBuffer())).match(/\/Type \/Page\b/g)).toHaveLength(1)

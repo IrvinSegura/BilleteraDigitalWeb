@@ -6,6 +6,16 @@ import { operationStatus } from '@/lib/labels'
 
 import type { Movement } from './MovementList'
 
+export function useMovement(walletId: string, transactionId: string, enabled = true) {
+  return useQuery({
+    queryKey: ['wallets', walletId, 'movement', transactionId],
+    enabled,
+    queryFn: () => unwrap(api.GET('/api/v1/wallets/{walletId}/movements/{transactionId}', {
+      params: { path: { walletId, transactionId } },
+    })),
+  })
+}
+
 // The operation behind a movement, for the details only it has (counterpart, concept, payout status)
 export function useOperation(movement: Movement | undefined, walletId: string) {
   const id = movement?.operationId

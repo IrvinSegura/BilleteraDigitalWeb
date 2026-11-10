@@ -76,6 +76,11 @@ describe('AdminSupportPage', () => {
   describe('assistant report', () => {
     const MISSES = '/api/v1/admin/support/bot/misses'
     const lastMisses = () => api.calls.filter((c) => c.path === MISSES).at(-1)!
+    const SUGGESTIONS = '/api/v1/admin/support/bot/suggestions'
+    const suggestion = {
+      id: 's1', conversationId: 'conv-3', agentName: 'Laura Pérez', language: 'es', question: '¿Cuánto tarda un SPEI?',
+      answer: 'Llega en unos minutos.', status: 'OPEN', createdAt: AT,
+    }
     const miss = {
       kind: 'NOT_HELPED', language: 'es', question: 'no me llega mi retiro', topics: ['¿Cuánto tarda un retiro?'],
       times: 3, lastAskedAt: AT, conversationId: 'conv-9',
@@ -86,6 +91,7 @@ describe('AdminSupportPage', () => {
         questions: 40, answered: 25, helped: 10, notHelped: 4, notFound: 6, suggested: 5, askedAgain: 2, passedOn: 2,
       })
       api.on('GET', MISSES, { items: [miss], page: 0, size: 20, hasNext: false })
+      api.on('GET', SUGGESTIONS, { items: [], page: 0, size: 20, hasNext: false, open: 0 })
     })
 
     it('opens from the view switch and keeps it in the address', async () => {
@@ -123,11 +129,81 @@ describe('AdminSupportPage', () => {
       expect(currentLocation()).toBe('/admin/support?view=bot&kind=NOT_FOUND&language=en&days=7')
     })
 
+    it('lists what agents suggest the assistant learn, and marks one added', async () => {
+      api.on('GET', SUGGESTIONS, { items: [suggestion], page: 0, size: 20, hasNext: false, open: 1 })
+      api.on('POST', `${SUGGESTIONS}/{id}/review`, () => {
+        api.on('GET', SUGGESTIONS, { items: [], page: 0, size: 20, hasNext: false, open: 0 })
+        return { ...suggestion, status: 'ADDED', reviewedByName: 'Admin' }
+      })
+      open('/admin/support?view=bot')
+
+      const card = (await screen.findByText('¿Cuánto tarda un SPEI?')).closest('li') as HTMLElement
+      expect(within(card).getByText('Llega en unos minutos.')).toBeInTheDocument()
+      expect(within(card).getByText('Propuso Laura Pérez · ES')).toBeInTheDocument()
+      expect(within(card).getByRole('link', { name: 'Ver conversación' })).toHaveAttribute('href', '/admin/support/conv-3')
+      expect(api.callsTo('GET', SUGGESTIONS)[0]!.query.get('status')).toBe('OPEN')
+      await userEvent.click(within(card).getByRole('button', { name: 'Ya la agregué' }))
+
+      await waitFor(() => expect(api.callsTo('POST', `${SUGGESTIONS}/{id}/review`)[0]?.body).toEqual({ status: 'ADDED' }))
+      expect(await screen.findByText('Sin sugerencias')).toBeInTheDocument()
+    })
+
     it('says when there is nothing to fix', async () => {
       api.on('GET', MISSES, { items: [], page: 0, size: 20, hasNext: false })
       open('/admin/support?view=bot')
 
       expect(await screen.findByText('Sin preguntas fallidas')).toBeInTheDocument()
+    })
+  })
+
+  it('shows the team\'s notes on a case and how it ended', async () => {
+    api.on('GET', `${LIST}/{id}`, {
+      conversation: { id: 'case-1', status: 'RESOLVED', resolution: 'TICKET', userName: 'Ana López', agentName: 'Laura Pérez', awaitsSurvey: false, createdAt: AT, messages: [] },
+      notes: [{ id: 'n1', authorName: 'Laura Pérez', text: 'Lo pasé a administración', createdAt: AT }],
+    })
+    open('/admin/support/case-1')
+
+    expect(await screen.findByText('Lo pasé a administración')).toBeInTheDocument()
+    expect(screen.getByText('Escalado a administración')).toBeInTheDocument()
+  })
+
+  describe('team report', () => {
+    const AGENTS = '/api/v1/admin/support/agents'
+    const metrics = { days: 30, attended: 12, resolved: 10, firstResponseSeconds: 90, handleSeconds: 600, surveys: 4, averageScore: 4.5 }
+
+    beforeEach(() => {
+      api.on('GET', AGENTS, [
+        { id: 'a1', name: 'Laura Pérez', busy: true, available: true, metrics },
+        { id: 'a2', name: 'Mario Ruiz', busy: false, available: false, metrics: { days: 30, attended: 0, resolved: 0, surveys: 0 } },
+        { id: 'a3', name: 'Sofía Gil', busy: false, available: true, metrics: { days: 30, attended: 1, resolved: 1, surveys: 0 } },
+      ])
+    })
+
+    it('shows who attends, who is free or paused, and how each did', async () => {
+      open('/admin/support?view=team')
+
+      const laura = (await screen.findByRole('cell', { name: 'Laura Pérez' })).closest('tr') as HTMLElement
+      expect(within(laura).getByText('Atendiendo')).toBeInTheDocument()
+      expect(within(laura).getByText('2 min')).toBeInTheDocument()
+      expect(within(laura).getByText('10 min')).toBeInTheDocument()
+      expect(within(laura).getByText('4.5 (4)')).toBeInTheDocument()
+      const mario = screen.getByRole('cell', { name: 'Mario Ruiz' }).closest('tr') as HTMLElement
+      expect(within(mario).getByText('En pausa')).toBeInTheDocument()
+      // No times nor rating without cases
+      expect(within(mario).getAllByText('—')).toHaveLength(3)
+      const stats = screen.getByLabelText('Desempeño del equipo')
+      expect(within(stats).getByText('Libre').nextSibling).toHaveTextContent('1')
+      expect(within(stats).getByText('En pausa').nextSibling).toHaveTextContent('1')
+    })
+
+    it('reads another period', async () => {
+      open('/admin/support?view=team')
+      await screen.findByRole('cell', { name: 'Laura Pérez' })
+
+      await userEvent.click(screen.getByRole('button', { name: '7 días' }))
+
+      await waitFor(() => expect(api.callsTo('GET', AGENTS).at(-1)!.query.get('days')).toBe('7'))
+      expect(currentLocation()).toBe('/admin/support?view=team&days=7')
     })
   })
 })

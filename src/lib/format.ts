@@ -43,6 +43,9 @@ const SHORT_DAY: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
 const CALENDAR_DAY: Intl.DateTimeFormatOptions = { ...SHORT_DAY, timeZone: 'UTC' }
 const CALENDAR_DATE: Intl.DateTimeFormatOptions = { ...DATE_ONLY, timeZone: 'UTC' }
 const CALENDAR_MONTH: Intl.DateTimeFormatOptions = { month: 'long', year: 'numeric', timeZone: 'UTC' }
+const CALENDAR_LONG: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }
+const WEEKDAY: Intl.DateTimeFormatOptions = { weekday: 'short', timeZone: 'UTC' }
+const WEEKDAY_LONG: Intl.DateTimeFormatOptions = { weekday: 'long', timeZone: 'UTC' }
 
 // Creating a formatter is slow and a statement formats hundreds of dates, so each one is kept per locale
 const dateFormats = new Map<string, Intl.DateTimeFormat>()
@@ -84,6 +87,26 @@ export function formatCalendarDate(date: string): string {
   return dateFormat(CALENDAR_DATE).format(new Date(`${date}T00:00:00Z`))
 }
 
+/** A period with what both ends share said once: "1–30 nov 2026", "28 oct – 6 nov 2026". */
+export function formatCalendarRange(from: string, to: string): string {
+  return dateFormat(CALENDAR_DATE).formatRange(new Date(`${from}T00:00:00Z`), new Date(`${to}T00:00:00Z`))
+}
+
+/** The whole day, for screen readers: "viernes, 6 de noviembre de 2026". */
+export function formatLongCalendarDate(date: string): string {
+  return dateFormat(CALENDAR_LONG).format(new Date(`${date}T00:00:00Z`))
+}
+
+/** The days of the week from Sunday, as Mexico and the US both start it: short ("Do", "Lu"…) and in full. */
+export function weekdays(): { short: string; long: string }[] {
+  // 4 January 2026 was a Sunday
+  return Array.from({ length: 7 }, (_, i) => {
+    const day = new Date(Date.UTC(2026, 0, 4 + i))
+    const short = dateFormat(WEEKDAY).format(day)
+    return { short: short.charAt(0).toUpperCase() + short.slice(1, 2), long: dateFormat(WEEKDAY_LONG).format(day) }
+  })
+}
+
 /** A month as `2026-11` names it: "noviembre de 2026", "November 2026". */
 export function formatMonth(month: string): string {
   return dateFormat(CALENDAR_MONTH).format(new Date(`${month}-01T00:00:00Z`))
@@ -105,6 +128,23 @@ export function formatRelative(iso: string | undefined): string {
 }
 
 /** A count, with the digit grouping of the active language. */
+/** A span of time in seconds, as short as it reads well: 40 s, 12 min, 2 h 5 min. */
+export function formatDuration(seconds: number | null | undefined): string {
+  if (seconds == null || !Number.isFinite(seconds)) {
+    return '—'
+  }
+  const total = Math.max(0, Math.round(seconds))
+  if (total < 60) {
+    return `${total} s`
+  }
+  const minutes = Math.round(total / 60)
+  if (minutes < 60) {
+    return `${minutes} min`
+  }
+  const rest = minutes % 60
+  return rest === 0 ? `${Math.floor(minutes / 60)} h` : `${Math.floor(minutes / 60)} h ${rest} min`
+}
+
 export function formatCount(count: number | undefined): string {
   return (count ?? 0).toLocaleString(activeLocale())
 }

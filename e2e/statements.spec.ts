@@ -60,3 +60,26 @@ test("downloads one wallet's statement from its own page", async () => {
   expect(pdf.name).toBe(`estado-de-cuenta-mxn-${month()}.pdf`)
   expect(pdf.bytes.length).toBeGreaterThan(2000)
 })
+
+test('only offers periods since the first record', async () => {
+  await page.goto('/statements')
+  // Everything of this user happened today: no earlier month, nor the three together
+  const picker = page.getByRole('combobox', { name: 'Periodo' })
+  await picker.click()
+  await expect(page.getByRole('option')).toHaveText(['Último mes', 'Elegir fechas'])
+  await page.getByRole('option', { name: 'Elegir fechas' }).click()
+
+  // The calendar opens on this month alone, with today the only day to pick
+  const calendar = page.getByRole('dialog', { name: 'Fechas del estado de cuenta' })
+  const today = await page.evaluate(() => new Date().toLocaleDateString('en-CA'))
+  await expect(calendar.getByRole('grid')).toHaveCount(1)
+  await expect(calendar.getByRole('button', { name: 'Mes anterior' })).toBeDisabled()
+  await expect(calendar.getByRole('button', { name: 'Mes siguiente' })).toBeDisabled()
+  await expect(calendar.locator(`[data-date="${today}"]`)).not.toHaveAttribute('aria-disabled', 'true')
+  await expect(calendar.locator('[data-date]:not([aria-disabled])')).toHaveCount(1)
+
+  await calendar.locator(`[data-date="${today}"]`).click()
+  await calendar.locator(`[data-date="${today}"]`).click()
+  await calendar.getByRole('button', { name: 'Aplicar' }).click()
+  await expect(page).toHaveURL(`/statements?from=${today}&to=${today}`)
+})

@@ -10,7 +10,7 @@ import { formatDateTime, formatMoney } from '@/lib/format'
  * of the stored body. That also covers notifications saved before this existed. When a body doesn't match what the
  * API writes (it changed, say) the notice falls back to a version without figures rather than to English.
  */
-type Keys = { titleKey?: 'titleReset'; bodyKey: 'body' | 'bodyGeneric' | 'bodyOne' | 'bodyReset' | 'bodySupport'; values?: Record<string, string> }
+type Keys = { titleKey?: 'titleReset'; bodyKey: 'body' | 'bodyCredit' | 'bodyDebit' | 'bodyGeneric' | 'bodyOne' | 'bodyReset' | 'bodySupport'; values?: Record<string, string> }
 
 const AMOUNT = String.raw`(\d+(?:\.\d+)?) ([A-Z]{3})`
 
@@ -30,6 +30,11 @@ function withAmount(body: string, pattern: RegExp): Keys {
 function withCurrency(body: string): Keys {
   const currency = body.match(/^Your ([A-Z]{3}) wallet/)?.[1]
   return currency ? { bodyKey: 'body', values: { currency } } : { bodyKey: 'bodyGeneric' }
+}
+
+// The body is what the administrator wrote, in whatever language they wrote it
+function withResolution(body: string): Keys {
+  return body.trim() ? { bodyKey: 'body', values: { resolution: body.trim() } } : { bodyKey: 'bodyGeneric' }
 }
 
 const readers: Record<string, (body: string, t: TFunction, language: string) => Keys> = {
@@ -70,6 +75,20 @@ const readers: Record<string, (body: string, t: TFunction, language: string) => 
   },
   WALLET_FROZEN: withCurrency,
   WALLET_UNFROZEN: withCurrency,
+  // The reason is what the administrator wrote for the customer, in whatever language they wrote it
+  WALLET_ADJUSTED: (body) => {
+    const match = body.match(new RegExp(`^We (added|took) ${AMOUNT} (?:to|from) your wallet: (.+)$`, 's'))
+    if (!match) return { bodyKey: 'bodyGeneric' }
+    return { bodyKey: match[1] === 'added' ? 'bodyCredit' : 'bodyDebit', values: { amount: money(match[2]!, match[3]!), reason: match[4]! } }
+  },
+  // The reason is what the administrator wrote for the customer, in whatever language they wrote it
+  IDENTITY_REJECTED: (body) => {
+    const reason = body.match(/^We reviewed your INE and could not verify it: (.+)$/s)?.[1]
+    return reason ? { bodyKey: 'body', values: { reason } } : { bodyKey: 'bodyGeneric' }
+  },
+  // The body is what the administrator wrote for the customer, in whatever language they wrote it
+  SUPPORT_TICKET_RESOLVED: withResolution,
+  SUPPORT_ESCALATION_RESOLVED: withResolution,
 }
 
 type Translated = keyof typeof es.notifications.types

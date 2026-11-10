@@ -13,6 +13,7 @@ import { Card } from '@/components/ui/card'
 
 import { ChatComposer } from './ChatComposer'
 import { ChatAvatar, ChatThread } from './ChatThread'
+import { ReportMovement } from './ReportMovement'
 import { attachmentForm, type Conversation, SUPPORT_QUERY_KEY, useConversation } from './support-api'
 import { SurveyForm } from './SurveyForm'
 
@@ -111,6 +112,7 @@ export function SupportPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <PageHeader title={t('support.title')} description={t('support.description')} />
+      <ReportMovement status={current?.status} onSent={set} />
       <Card className="h-[calc(100svh-19rem)] min-h-[28rem] lg:h-[calc(100svh-15rem)] gap-0 overflow-hidden py-0">
         <ChatHeader conversation={current}>
           {withBot && (

@@ -10,6 +10,7 @@ export function testUser(overrides: Partial<User> = {}): User {
     role: 'USER',
     emailVerified: true,
     twoFactorEnabled: false,
+    mustChangePassword: false,
     language: 'es',
     createdAt: '2026-01-15T12:00:00Z',
     ...overrides,

@@ -110,12 +110,20 @@ export function IdCell({ id, to }: { id: string | undefined; to?: string }) {
 /**
  * Admin actions that change someone's account all ask for a reason, which goes to the audit log.
  */
-export function ReasonAction({ trigger, title, description, confirmLabel, destructive, onConfirm }: {
+export function ReasonAction({
+  trigger, title, description, confirmLabel, destructive, onConfirm, fieldLabel, fieldHint, maxLength = 200, primary,
+}: {
   trigger: ReactNode
   title: string
   description: string
   confirmLabel: string
   destructive?: boolean
+  /** What is written, when it is more than a reason for the log (a resolution the customer reads, say). */
+  fieldLabel?: string
+  fieldHint?: string
+  maxLength?: number
+  /** The trigger as the page's main button rather than an outline one. */
+  primary?: boolean
   onConfirm: (reason: string) => Promise<unknown>
 }) {
   const { t } = useTranslation()
@@ -131,16 +139,16 @@ export function ReasonAction({ trigger, title, description, confirmLabel, destru
   })
   return (
     <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) action.reset() }}>
-      <DialogTrigger render={<Button variant={destructive ? 'destructive' : 'outline'} size="sm" />}>{trigger}</DialogTrigger>
+      <DialogTrigger render={<Button variant={destructive ? 'destructive' : primary ? 'default' : 'outline'} size="sm" />}>{trigger}</DialogTrigger>
       <DialogContent className="p-6 sm:max-w-md">
         <form className="grid gap-5" onSubmit={(e) => { e.preventDefault(); action.mutate() }}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
-          <FormField label={t('common.reason')} hint={t('admin.reasonHint')}>
+          <FormField label={fieldLabel ?? t('common.reason')} hint={fieldHint ?? t('admin.reasonHint')}>
             {(field) => (
-              <textarea {...field} required autoFocus maxLength={200} rows={3} value={reason} onChange={(e) => setReason(e.target.value)}
+              <textarea {...field} required autoFocus maxLength={maxLength} rows={3} value={reason} onChange={(e) => setReason(e.target.value)}
                 className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30" />
             )}
           </FormField>

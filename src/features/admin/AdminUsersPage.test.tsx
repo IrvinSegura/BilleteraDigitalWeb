@@ -7,6 +7,9 @@ import { currentLocation, renderWithProviders } from '@/test/render'
 
 const api = stubApi()
 vi.mock('@/auth/auth-context', () => ({ useAuth: () => ({ state: { status: 'signed-out' }, logout: vi.fn() }) }))
+vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
+
+const { toast } = await import('sonner')
 
 const { AdminUsersPage } = await import('./AdminUsersPage')
 
@@ -25,6 +28,68 @@ const lastList = () => api.calls.filter((c) => c.path === '/api/v1/admin/users')
 function open(route = '/admin/users') {
   return renderWithProviders(<AdminUsersPage />, { route, path: '/admin/users/:userId?' })
 }
+
+const created = { ...ana, id: ID, email: 'laura@example.com', fullName: 'Laura Díaz', role: 'SUPPORT' }
+
+async function fillStaffForm() {
+  await userEvent.click(screen.getByRole('button', { name: 'Crear nuevo admin/soporte' }))
+  const dialog = screen.getByRole('dialog')
+  await userEvent.type(within(dialog).getByLabelText('Nombre completo'), 'Laura Díaz')
+  await userEvent.type(within(dialog).getByLabelText('Correo de trabajo'), 'laura@example.com')
+  await userEvent.type(within(dialog).getByLabelText('Motivo'), 'Se une al equipo')
+  return dialog
+}
+
+describe('creating a team account', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    api.reset()
+    api.on('GET', '/api/v1/admin/users', page([ana]))
+    api.on('GET', '/api/v1/admin/users/stats', { total: 1, active: 1, disabled: 0, unverified: 0, admins: 0 })
+    api.on('GET', '/api/v1/admin/users/{userId}', created)
+    api.on('GET', '/api/v1/admin/users/{userId}/wallets', [])
+  })
+
+  it('names what it creates by the role chosen in a select', async () => {
+    open()
+    const dialog = await fillStaffForm()
+    expect(within(dialog).getByRole('button', { name: 'Crear nuevo soporte' })).toBeInTheDocument()
+
+    await userEvent.click(within(dialog).getByRole('combobox', { name: 'Rol' }))
+    await userEvent.click(await screen.findByRole('option', { name: 'Administrador' }))
+
+    expect(within(dialog).getByRole('button', { name: 'Crear nuevo admin' })).toBeInTheDocument()
+  })
+
+  it('says the data goes by email, shows no password and opens the new account', async () => {
+    api.on('POST', '/api/v1/admin/users', created)
+    open()
+    const dialog = await fillStaffForm()
+    expect(within(dialog).getByText(/Le enviaremos por correo su rol/)).toBeInTheDocument()
+
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Crear nuevo soporte' }))
+
+    await waitFor(() => expect(currentLocation()).toBe(`/admin/users/${ID}`))
+    expect(api.callsTo('POST', '/api/v1/admin/users')[0]!.body).toEqual({
+      email: 'laura@example.com', fullName: 'Laura Díaz', role: 'SUPPORT', reason: 'Se une al equipo',
+    })
+    expect(toast.success).toHaveBeenCalledWith('Cuenta creada. Enviamos sus datos de acceso a laura@example.com.')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(screen.queryByText(/contraseña/i)).not.toBeInTheDocument()
+  })
+
+  it('stays open and says why when the account cannot be created', async () => {
+    api.on('POST', '/api/v1/admin/users', problem(409, 'EMAIL_ALREADY_REGISTERED'))
+    open()
+    const dialog = await fillStaffForm()
+
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Crear nuevo soporte' }))
+
+    expect(await within(dialog).findByRole('alert')).toBeInTheDocument()
+    expect(currentLocation()).toBe('/admin/users')
+    expect(toast.success).not.toHaveBeenCalled()
+  })
+})
 
 describe('AdminUsersPage', () => {
   beforeEach(() => {
@@ -82,8 +147,10 @@ describe('AdminUsersPage', () => {
     await screen.findByRole('link', { name: 'Ana López' })
     expect(lastList().query.get('page')).toBe('2')
 
-    await userEvent.click(within(screen.getByRole('group', { name: 'Estado de la cuenta' })).getByRole('button', { name: 'Deshabilitada' }))
-    await userEvent.click(within(screen.getByRole('group', { name: 'Rol' })).getByRole('button', { name: 'Administrador' }))
+    await userEvent.click(screen.getByRole('combobox', { name: 'Estado de la cuenta' }))
+    await userEvent.click(await screen.findByRole('option', { name: 'Deshabilitadas' }))
+    await userEvent.click(screen.getByRole('combobox', { name: 'Tipo de usuario' }))
+    await userEvent.click(await screen.findByRole('option', { name: 'Administrador' }))
 
     await waitFor(() => expect(lastList().query.get('role')).toBe('ADMIN'))
     expect(lastList().query.get('status')).toBe('DISABLED')
@@ -129,7 +196,7 @@ describe('AdminUsersPage', () => {
     open(`/admin/users/${ID}`)
     expect(await screen.findByText('Este usuario no tiene billeteras.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Todos los usuarios' })).toHaveAttribute('href', '/admin/users')
-    expect(screen.queryByRole('group', { name: 'Rol' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: 'Tipo de usuario' })).not.toBeInTheDocument()
     expect(api.calls.some((c) => c.path === '/api/v1/admin/users')).toBe(false)
   })
 
@@ -154,7 +221,8 @@ describe('AdminUsersPage', () => {
       open()
       await screen.findByRole('link', { name: 'Ana López' })
 
-      await userEvent.click(within(screen.getByRole('group', { name: 'Estado de la cuenta' })).getByRole('button', { name: 'Cerrada' }))
+      await userEvent.click(screen.getByRole('combobox', { name: 'Estado de la cuenta' }))
+      await userEvent.click(await screen.findByRole('option', { name: 'Cerradas' }))
 
       await waitFor(() => expect(lastList().query.get('status')).toBe('CLOSED'))
       expect(currentLocation()).toBe('/admin/users?status=CLOSED')

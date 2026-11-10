@@ -2,14 +2,15 @@ import type { jsPDF } from 'jspdf'
 
 import { currencyName } from '@/components/CurrencyIcon'
 import i18n from '@/i18n'
-import { formatCalendarDate, formatDateTime, formatMoney, formatMonth, shortId } from '@/lib/format'
+import { formatCalendarDate, formatDateTime, formatMoney, shortId } from '@/lib/format'
 import { movementLabel } from '@/lib/labels'
 
-import { lastDay, type Money, type WalletStatement } from './statement-data'
+import { type Money, type Period, periodSlug, periodTitle, type WalletStatement } from './statement-data'
 
 export interface StatementDocument {
   holder: { fullName: string; email: string }
-  month: string
+  /** A month, the last three months together, or days the user picked. */
+  period: Period
   /** One wallet for its own statement; every wallet for the general one. */
   wallets: WalletStatement[]
   general: boolean
@@ -47,17 +48,16 @@ function currencyTitle(currency: string) {
   const name = currencyName(currency)
   return pdfText(name === currency ? currency : `${name} (${currency})`)
 }
-const capitalized = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
-/** The statement's reference, printed on every page and named in the file: the month and whose it is. */
-export function statementFolio(month: string, wallets: WalletStatement[], general: boolean): string {
+/** The statement's reference, printed on every page and named in the file: the period and whose it is. */
+export function statementFolio(period: Period, wallets: WalletStatement[], general: boolean): string {
   const owner = general ? 'GEN' : shortId(wallets[0]?.walletId).toUpperCase()
-  return `EC-${month.replace('-', '')}-${owner}`
+  return `EC-${periodSlug(period).replace(/-/g, '').replace('_', '-')}-${owner}`
 }
 
 export function statementFileName(document: StatementDocument): string {
   const which = document.general ? i18n.t('statements.pdf.allFileName') : document.wallets[0]?.currency.toLowerCase()
-  return `${i18n.t('statements.pdf.fileName')}-${which}-${document.month}.pdf`
+  return `${i18n.t('statements.pdf.fileName')}-${which}-${periodSlug(document.period)}.pdf`
 }
 
 class Writer {
@@ -129,7 +129,7 @@ function accentBar(w: Writer, y: number, height: number) {
 }
 
 function drawFirstHeader(w: Writer, document: StatementDocument) {
-  const { month } = document
+  const { period } = document
   drawLogo(w, PAGE_MARGIN, w.y, 32)
   w.font(15, 'bold', INK)
   w.doc.text('Billetera', PAGE_MARGIN + 42, w.y + 15)
@@ -139,10 +139,10 @@ function drawFirstHeader(w: Writer, document: StatementDocument) {
   const right = w.width - PAGE_MARGIN
   w.label(i18n.t(document.general ? 'statements.pdf.generalKind' : 'wallets.statement.kind'), right, w.y + 6, MUTED, 'right')
   w.font(15, 'bold', INK)
-  w.doc.text(pdfText(capitalized(formatMonth(month))), right, w.y + 22, { align: 'right' })
+  w.doc.text(pdfText(periodTitle(period)), right, w.y + 22, { align: 'right' })
   w.font(8.5, 'normal', SOFT)
   w.doc.text(pdfText(i18n.t('wallets.statement.period', {
-    from: formatCalendarDate(`${month}-01`), to: formatCalendarDate(lastDay(month)),
+    from: formatCalendarDate(period.from), to: formatCalendarDate(period.to),
   })), right, w.y + 34, { align: 'right' })
   w.y += 48
   accentBar(w, w.y, 3)
@@ -168,7 +168,7 @@ function drawFields(w: Writer, fields: { label: string; value: string }[]) {
   w.y += height + 20
 }
 
-/** The month of one wallet as four tiles, the closing balance standing out. */
+/** The period of one wallet as four tiles, the closing balance standing out. */
 function drawBalanceTiles(w: Writer, statement: WalletStatement) {
   const tiles: { label: string; value: Money | undefined; tone: Rgb; strong?: boolean }[] = [
     { label: i18n.t('wallets.statement.openingBalance'), value: statement.openingBalance, tone: TEXT },
@@ -314,7 +314,7 @@ function drawPageFrames(w: Writer, document: StatementDocument, folio: string) {
   const generated = pdfText(i18n.t('print.generatedAt', { date: formatDateTime(new Date().toISOString()) }))
   const currencies = [...new Set(document.wallets.map((wallet) => wallet.currency))].join(', ')
   const legal = pdfText(i18n.t('wallets.statement.legal', { currency: currencies || i18n.t('wallets.statement.walletCurrency') }))
-  const title = pdfText(`${i18n.t(document.general ? 'statements.pdf.generalKind' : 'wallets.statement.kind')} · ${capitalized(formatMonth(document.month))}`)
+  const title = pdfText(`${i18n.t(document.general ? 'statements.pdf.generalKind' : 'wallets.statement.kind')} · ${periodTitle(document.period)}`)
   for (let page = 1; page <= pages; page++) {
     w.doc.setPage(page)
     if (page > 1) {
@@ -348,9 +348,9 @@ function drawPageFrames(w: Writer, document: StatementDocument, folio: string) {
 export async function buildStatementPdf(document: StatementDocument): Promise<Blob> {
   const [{ jsPDF }, { autoTable }] = await Promise.all([import('jspdf'), import('jspdf-autotable')])
   const doc = new jsPDF({ unit: 'pt', format: 'letter', compress: true })
-  const folio = statementFolio(document.month, document.wallets, document.general)
+  const folio = statementFolio(document.period, document.wallets, document.general)
   doc.setProperties({
-    title: pdfText(`${i18n.t(document.general ? 'statements.pdf.generalKind' : 'wallets.statement.kind')} ${formatMonth(document.month)}`),
+    title: pdfText(`${i18n.t(document.general ? 'statements.pdf.generalKind' : 'wallets.statement.kind')} ${periodTitle(document.period)}`),
     subject: folio,
     author: 'Billetera',
     creator: 'Billetera',

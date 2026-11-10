@@ -34,6 +34,15 @@ export const auditActions = [
   'WITHDRAWAL_FAILED',
   'TRANSFER_COMPLETED',
   'PROVIDER_TRANSACTION_RESOLVED',
+  'IDENTITY_VERIFICATION_SUBMITTED',
+  'IDENTITY_VERIFIED',
+  'IDENTITY_REJECTED',
+  'STAFF_ACCOUNT_CREATED',
+  'SUPPORT_TICKET_OPENED',
+  'SUPPORT_TICKET_RESOLVED',
+  'ADJUSTMENT_REQUESTED',
+  'ADJUSTMENT_APPLIED',
+  'ADJUSTMENT_REJECTED',
 ] as const
 
 const money = (amount: string, currency: string) => formatMoney({ amount, currency })
@@ -45,6 +54,8 @@ const ID = String.raw`([0-9a-f-]{36})`
 const templates: [RegExp, (...parts: string[]) => string][] = [
   [/^role: (\S+), reason: (.+)$/s, (role, reason) => i18n.t('admin.audit.detail.roleChange', { role: labelOf('labels.roles', role), reason })],
   [/^role (\S+)$/, (role) => i18n.t('admin.audit.detail.role', { role: labelOf('labels.roles', role) })],
+  [/^document INE$/, () => i18n.t('admin.audit.detail.identityDocument')],
+  [/^approved$/, () => i18n.t('admin.audit.detail.approved')],
   [/^locked until (\S+)$/, (until) => i18n.t('admin.audit.detail.lockedUntil', { date: formatDateTime(until) })],
   [/^all sessions ended$/, () => i18n.t('admin.audit.detail.allSessionsEnded')],
   [/^(\d+) ended$/, (sessions) => i18n.t('admin.audit.detail.sessionsEnded', { sessions })],
@@ -64,6 +75,16 @@ const templates: [RegExp, (...parts: string[]) => string][] = [
     (id, amount, currency, reason) => i18n.t('admin.audit.detail.withdrawalReturned', { id: shortId(id), amount: money(amount, currency), reason })],
   [new RegExp(`^withdrawal ${ID}: ${AMOUNT}$`),
     (id, amount, currency) => i18n.t('admin.audit.detail.withdrawal', { id: shortId(id), amount: money(amount, currency) })],
+  [new RegExp(`^ticket ${ID}: (\\S+) ${ID}$`),
+    (id, kind, operation) => i18n.t('admin.audit.detail.ticketOpened', { id: shortId(id), kind: labelOf('support.inbox.kinds', kind), operation: shortId(operation) })],
+  [new RegExp(`^ticket ${ID}: (\\S+)$`),
+    (id, category) => i18n.t('admin.audit.detail.ticketOpenedCategory', { id: shortId(id), category: labelOf('support.inbox.categories', category.toUpperCase()) })],
+  [new RegExp(`^adjustment ${ID}: (credit|debit) ${AMOUNT}, reason: (.+)$`, 's'),
+    (id, direction, amount, currency, reason) => i18n.t(direction === 'credit' ? 'admin.audit.detail.adjustmentCredit' : 'admin.audit.detail.adjustmentDebit', { id: shortId(id), amount: money(amount, currency), reason })],
+  [new RegExp(`^adjustment ${ID}, reason: (.+)$`, 's'),
+    (id, reason) => i18n.t('admin.audit.detail.adjustmentRejected', { id: shortId(id), reason })],
+  [new RegExp(`^ticket ${ID}, resolution: (.+)$`, 's'),
+    (id, resolution) => i18n.t('admin.audit.detail.ticketResolved', { id: shortId(id), resolution })],
   [new RegExp(`^transfer ${ID}: ${AMOUNT} to wallet ${ID}$`),
     (id, amount, currency, wallet) => i18n.t('admin.audit.detail.transfer', { id: shortId(id), amount: money(amount, currency), wallet: shortId(wallet) })],
 ]

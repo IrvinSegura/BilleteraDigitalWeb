@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { CheckCheck, CreditCard } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router'
 
 import { api, type Schemas, unwrap } from '@/api/client'
 import { EmptyState } from '@/components/EmptyState'
@@ -128,7 +129,9 @@ function ResolveAction({ transaction }: { transaction: Transaction }) {
 
 export function AdminPaymentsPage() {
   const { t } = useTranslation()
-  const [status, setStatus] = useState<Status>('ALL')
+  // The console's home links straight to what needs a person
+  const [params] = useSearchParams()
+  const [status, setStatus] = useState<Status>(params.get('status') === 'UNMATCHED' ? 'UNMATCHED' : 'ALL')
   const transactions = useQuery({
     queryKey: ['admin', 'payments', 'transactions', status],
     queryFn: () => unwrap(api.GET('/api/v1/admin/payments/provider-transactions', {

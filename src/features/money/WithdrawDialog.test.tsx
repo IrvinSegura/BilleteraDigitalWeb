@@ -45,6 +45,24 @@ describe('WithdrawDialog', () => {
     expect(screen.getByText('Verifica tu correo primero')).toBeInTheDocument()
   })
 
+  it('says the INE must be verified first and leads to it, without hiding the form', async () => {
+    api.on('GET', '/api/v1/users/me/identity-verification', { status: 'NOT_STARTED', attemptsLeft: 3 })
+    const onClose = open()
+    const link = await screen.findByRole('link', { name: 'Verificar ahora' })
+    expect(screen.getByText(/primero verifica tu identidad/)).toBeInTheDocument()
+    expect(screen.getByLabelText('Monto')).toBeInTheDocument()
+    await userEvent.click(link)
+    expect(currentLocation()).toBe('/settings/identity')
+    expect(onClose).toHaveBeenCalled()
+  })
+
+  it('only says the INE is under review while it is', async () => {
+    api.on('GET', '/api/v1/users/me/identity-verification', { status: 'PENDING_REVIEW', attemptsLeft: 2 })
+    open()
+    expect(await screen.findByText(/está en revisión/)).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Verificar ahora' })).not.toBeInTheDocument()
+  })
+
   it('always asks for the password up front and sends it with the CLABE chosen', async () => {
     open()
     expect(await screen.findByText(/BBVA.*4321|•• 4321/)).toBeInTheDocument()
@@ -142,6 +160,21 @@ describe('WithdrawDialog', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Confirmar retiro' }))
     await screen.findByText('Retiro en camino')
     expect(api.callsTo('POST', '/api/v1/wallets/{walletId}/withdrawals')[0]!.body).not.toHaveProperty('bankAccountId')
+  })
+
+  it('offers only the wallets whose currency can be withdrawn', async () => {
+    api.on('GET', '/api/v1/withdrawals/currencies', { currencies: ['MXN'] })
+    open('wallet-usd', [mxnWallet, usdWallet])
+    // The dollar wallet asked for is passed over for the one in pesos, which goes to a CLABE
+    expect(await screen.findByText(/•• 4321/)).toBeInTheDocument()
+    expect(screen.queryByText('Desde')).not.toBeInTheDocument()
+  })
+
+  it('says withdrawals are in pesos when no wallet can withdraw', async () => {
+    api.on('GET', '/api/v1/withdrawals/currencies', { currencies: ['MXN'] })
+    open('wallet-usd', [usdWallet])
+    expect(await screen.findByText(/solo puedes retirar pesos/)).toBeInTheDocument()
+    expect(screen.queryByLabelText('Monto')).not.toBeInTheDocument()
   })
 
   it('shows the API refusal on the review', async () => {
