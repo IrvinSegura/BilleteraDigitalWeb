@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Eye, FileDown, FileText, Loader2, Wallet } from 'lucide-react'
+import { Eye, FileDown, FileText, Loader2, Wallet } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router'
 
@@ -13,40 +13,25 @@ import { Skeleton } from '@/components/Skeleton'
 import { StatusBadge } from '@/components/StatusBadge'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { currentMonth } from '@/features/wallets/MovementFilterBar'
-import { formatCalendarDate, formatMoney, formatMonth } from '@/lib/format'
+import { currentMonth, today } from '@/features/wallets/MovementFilterBar'
+import { formatCalendarDate, formatMoney } from '@/lib/format'
 import { walletStatus } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 
-import { lastDay, MONTH, shiftMonth } from './statement-data'
+import { PeriodPicker } from './PeriodPicker'
+import { firstRecordDay, monthPeriod, type Period, periodFromParams, periodTitle, periodToParams } from './statement-data'
 import { useStatementDownload } from './use-statement-download'
 
 type WalletResponse = Schemas['WalletResponse']
 
-function MonthPicker({ month, onChange }: { month: string; onChange: (month: string) => void }) {
-  const { t } = useTranslation()
-  return (
-    <div className="flex items-center gap-1">
-      <Button variant="outline" size="icon-sm" aria-label={t('wallets.statement.previousMonth')} onClick={() => onChange(shiftMonth(month, -1))}>
-        <ChevronLeft />
-      </Button>
-      <span className="min-w-36 text-center text-sm font-medium capitalize" aria-live="polite">{formatMonth(month)}</span>
-      <Button variant="outline" size="icon-sm" aria-label={t('wallets.statement.nextMonth')} disabled={month >= currentMonth()}
-        onClick={() => onChange(shiftMonth(month, 1))}>
-        <ChevronRight />
-      </Button>
-    </div>
-  )
-}
-
-/** One wallet's month at a glance, with its own statement to open or download. */
-function WalletStatementCard({ wallet, month, download }: {
+/** One wallet's period at a glance, with its own statement to open or download. */
+function WalletStatementCard({ wallet, period, download }: {
   wallet: WalletResponse
-  month: string
+  period: Period
   download: ReturnType<typeof useStatementDownload>
 }) {
   const { t } = useTranslation()
-  const summary = useWalletSummary(wallet.id, month)
+  const summary = useWalletSummary(wallet.id, period)
   const currency = wallet.balance?.currency ?? ''
   const downloading = download.isPending && !download.variables?.general && download.variables?.wallets[0]?.id === wallet.id
   const figures = [
@@ -84,13 +69,13 @@ function WalletStatementCard({ wallet, month, download }: {
       </div>
       {summary.isError && <p className="px-5 pb-3 text-xs text-destructive">{t('statements.summaryError')}</p>}
       <div className="mt-auto flex gap-2 border-t bg-muted/30 px-5 py-3">
-        <Link to={`/wallets/${wallet.id}/statement?month=${month}`} className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'flex-1')}
+        <Link to={`/wallets/${wallet.id}/statement?${new URLSearchParams(periodToParams(period))}`} className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'flex-1')}
           aria-label={t('statements.viewWallet', { currency })}>
           <Eye /> {t('statements.view')}
         </Link>
         <Button variant="outline" size="sm" className="flex-1" disabled={download.isPending}
           aria-label={t('statements.downloadWallet', { currency })}
-          onClick={() => download.mutate({ month, general: false, wallets: [{ id: wallet.id!, currency }] })}>
+          onClick={() => download.mutate({ period, general: false, wallets: [{ id: wallet.id!, currency }] })}>
           {downloading ? <Loader2 className="animate-spin" /> : <FileDown />} {t('statements.pdf.short')}
         </Button>
       </div>
@@ -98,22 +83,28 @@ function WalletStatementCard({ wallet, month, download }: {
   )
 }
 
-/** Every statement of the user in one place: one per wallet and month, or a general one that covers all of them. */
+/**
+ * Every statement of the user in one place, for one of the last three months, the three together, or days they pick:
+ * one per wallet, or a general one that covers all of them. Nothing before their first wallet can be asked for.
+ */
 export function StatementsPage() {
   const { t } = useTranslation()
   const user = useUser()
   const [params, setParams] = useSearchParams()
-  const month = MONTH.test(params.get('month') ?? '') ? params.get('month')! : currentMonth()
   const wallets = useWallets()
   const download = useStatementDownload()
   const list = wallets.data ?? []
+  const day = today()
+  const first = firstRecordDay(list, user.createdAt)
+  const period = periodFromParams(params, monthPeriod(currentMonth()), first, day)
   const downloadingAll = download.isPending && !!download.variables?.general
-  const period = t('wallets.statement.period', { from: formatCalendarDate(`${month}-01`), to: formatCalendarDate(lastDay(month)) })
+  const range = t('wallets.statement.period', { from: formatCalendarDate(period.from), to: formatCalendarDate(period.to) })
 
   return (
     <div className="space-y-6">
       <PageHeader title={t('statements.title')} description={t('statements.description')}
-        actions={<MonthPicker month={month} onChange={(next) => setParams({ month: next })} />} />
+        actions={<PeriodPicker period={period} first={first} today={day}
+          onChange={(next) => setParams(periodToParams(next), { replace: true })} />} />
 
       {/* The general statement, presented as the document it downloads */}
       <Card className="relative overflow-hidden p-0">
@@ -125,8 +116,8 @@ export function StatementsPage() {
             </span>
             <div className="min-w-0 space-y-1">
               <p className="text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">{t('statements.pdf.generalKind')}</p>
-              <p className="text-lg font-semibold capitalize">{formatMonth(month)}</p>
-              <p className="text-sm text-muted-foreground">{period}</p>
+              <p className="text-lg font-semibold">{periodTitle(period)}</p>
+              <p className="text-sm text-muted-foreground">{range}</p>
               <p className="text-sm text-pretty text-muted-foreground">
                 {t('statements.generalHint', { name: user.fullName, count: list.length })}
               </p>
@@ -134,7 +125,7 @@ export function StatementsPage() {
           </div>
           <Button size="lg" className="shrink-0" disabled={list.length === 0 || download.isPending}
             onClick={() => download.mutate({
-              month, general: true,
+              period, general: true,
               wallets: list.map((wallet) => ({ id: wallet.id!, currency: wallet.balance?.currency ?? '' })),
             })}>
             {downloadingAll ? <Loader2 className="animate-spin" /> : <FileDown />}
@@ -156,7 +147,7 @@ export function StatementsPage() {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
-            {list.map((wallet) => <WalletStatementCard key={wallet.id} wallet={wallet} month={month} download={download} />)}
+            {list.map((wallet) => <WalletStatementCard key={wallet.id} wallet={wallet} period={period} download={download} />)}
           </div>
         )}
       </section>
