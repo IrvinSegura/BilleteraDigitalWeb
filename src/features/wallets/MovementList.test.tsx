@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { stubApi } from '@/test/api'
@@ -6,7 +7,7 @@ import { renderWithProviders } from '@/test/render'
 
 stubApi()
 
-const { MovementRow } = await import('./MovementList')
+const { MovementList, MovementRow } = await import('./MovementList')
 type Movement = Parameters<typeof MovementRow>[0]['movement']
 
 const movement = (fields: Partial<Movement>): Movement => ({
@@ -19,6 +20,16 @@ const row = (fields: Partial<Movement>) => {
   renderWithProviders(<MovementRow movement={movement(fields)} onOpen={vi.fn()} />)
   return screen.getByRole('button')
 }
+
+describe('MovementList', () => {
+  it('offers to report a problem from the detail, naming only the ids', async () => {
+    renderWithProviders(<MovementList movements={[movement({ type: 'ADJUSTMENT_CREDIT', direction: 'IN', transactionId: 't-9' })]} walletId="w-1" />)
+
+    await userEvent.click(screen.getByRole('button', { name: /Abono de ajuste/ }))
+
+    expect(await screen.findByRole('link', { name: /Reportar un problema/ })).toHaveAttribute('href', '/support?wallet=w-1&movement=t-9')
+  })
+})
 
 describe('MovementRow', () => {
   it('titles a transfer with the other person and says what kind it was and why', () => {

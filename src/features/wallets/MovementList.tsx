@@ -1,4 +1,4 @@
-import { ReceiptText } from 'lucide-react'
+import { LifeBuoy, ReceiptText } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
@@ -130,6 +130,10 @@ function MovementDetail({ movement, walletId }: { movement: Movement; walletId: 
       )}
       <Link to={`/wallets/${walletId}/receipts/${movement.transactionId}`} className={buttonVariants({ variant: 'outline' })}>
         <ReceiptText /> {t('wallets.movement.viewReceipt')}
+      </Link>
+      {/* Only ids in the address: the chat reads the movement again, as its owner */}
+      <Link to={`/support?wallet=${walletId}&movement=${movement.transactionId}`} className={buttonVariants({ variant: 'ghost' })}>
+        <LifeBuoy /> {t('wallets.movement.reportProblem')}
       </Link>
     </div>
   )

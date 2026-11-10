@@ -1,11 +1,9 @@
-import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, Printer, Share2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
 import { toast } from 'sonner'
 
-import { api, unwrap } from '@/api/client'
 import { useUser } from '@/auth/auth-context'
 import { ErrorState } from '@/components/ErrorState'
 import { PrintDocument, PrintFields, PrintSection, PrintStatus } from '@/components/PrintDocument'
@@ -16,17 +14,8 @@ import { formatDateTime, formatMoney, shortId } from '@/lib/format'
 import { movementLabel, operationStatus, type StatusStyle } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 
-import { type DetailRow, operationRows, useOperation } from './operation'
+import { type DetailRow, operationRows, useMovement, useOperation } from './operation'
 import { drawReceipt } from './receipt-image'
-
-function useMovement(walletId: string, transactionId: string) {
-  return useQuery({
-    queryKey: ['wallets', walletId, 'movement', transactionId],
-    queryFn: () => unwrap(api.GET('/api/v1/wallets/{walletId}/movements/{transactionId}', {
-      params: { path: { walletId, transactionId } },
-    })),
-  })
-}
 
 // The phone's share sheet where there is one (with the image attached), a download everywhere else
 async function shareOrSave(blob: Blob, filename: string, title: string) {

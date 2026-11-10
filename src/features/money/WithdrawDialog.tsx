@@ -1,12 +1,12 @@
 import { useMutation } from '@tanstack/react-query'
-import { ArrowLeft, Building2, Clock } from 'lucide-react'
+import { ArrowLeft, Building2, Clock, IdCard } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 
 import { api, unwrap } from '@/api/client'
 import { hasCode, moneyErrorMessage, outcomeUnknown } from '@/api/errors'
-import { useBankAccounts, useWallets } from '@/api/queries'
+import { useBankAccounts, useCanWithdraw, useIdentityVerification, useWallets } from '@/api/queries'
 import { useUser } from '@/auth/auth-context'
 import { AmountInput } from '@/components/AmountInput'
 import { FormError } from '@/components/ErrorState'
@@ -26,8 +26,12 @@ import { StepUpField, stepUpRequested, useStepUp } from './step-up'
 export function WithdrawDialog({ walletId: preferred, onClose }: { walletId?: string; onClose: () => void }) {
   const { t } = useTranslation()
   const user = useUser()
-  const { data: wallets } = useWallets()
+  const { data: allWallets } = useWallets()
+  const canWithdraw = useCanWithdraw()
+  // Only wallets whose currency the payout provider pays
+  const wallets = allWallets?.filter((w) => canWithdraw(w.balance?.currency))
   const bankAccounts = useBankAccounts()
+  const identity = useIdentityVerification()
   // Until the user picks one: the wallets may still be loading when the dialog opens
   const [pickedWallet, setWalletId] = useState('')
   const walletId = pickedWallet || defaultWalletId(wallets, preferred)
@@ -78,6 +82,20 @@ export function WithdrawDialog({ walletId: preferred, onClose }: { walletId?: st
       <>
         <DialogHeader><DialogTitle>{t('money.withdraw.title')}</DialogTitle></DialogHeader>
         <VerifyEmailNotice email={user.email} />
+      </>
+    )
+  }
+
+  if (wallets && allWallets?.length && wallets.length === 0) {
+    return (
+      <>
+        <DialogHeader>
+          <DialogTitle>{t('money.withdraw.title')}</DialogTitle>
+          <DialogDescription>{t('money.withdraw.currencyUnavailable')}</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button className="w-full" size="lg" onClick={onClose}>{t('common.done')}</Button>
+        </DialogFooter>
       </>
     )
   }
@@ -143,6 +161,9 @@ export function WithdrawDialog({ walletId: preferred, onClose }: { walletId?: st
   }
 
   const noAccounts = needsBank && bankAccounts.isSuccess && accounts.length === 0
+  // The API refuses withdrawals until the INE is approved; saying so here spares filling in the form first
+  const identityStatus = identity.data?.status
+  const unverified = !!identityStatus && identityStatus !== 'VERIFIED'
   return (
     <form
       className="grid gap-5"
@@ -156,9 +177,23 @@ export function WithdrawDialog({ walletId: preferred, onClose }: { walletId?: st
         <DialogTitle>{t('money.withdraw.title')}</DialogTitle>
         <DialogDescription>{t('money.withdraw.description')}</DialogDescription>
       </DialogHeader>
+      {unverified && (
+        <div className="flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/10 px-3.5 py-3 text-sm">
+          <IdCard className="mt-0.5 size-4 shrink-0 text-warning-foreground dark:text-warning" />
+          <p className="flex-1">
+            {t(identityStatus === 'PENDING_REVIEW' ? 'identity.withdrawPending' : 'identity.withdrawNotice')}{' '}
+            {identityStatus !== 'PENDING_REVIEW' && (
+              <Link to="/settings/identity" onClick={onClose} className="font-medium text-primary hover:underline">
+                {t('identity.verifyNow')}
+              </Link>
+            )}
+          </p>
+        </div>
+      )}
       {(wallets?.length ?? 0) > 1 && (
         <FormField label={t('common.from')}>
-          {(field) => <WalletSelect {...field} value={walletId} onValueChange={setWalletId} />}
+          {(field) => <WalletSelect {...field} value={walletId} onValueChange={setWalletId}
+            filter={(w) => canWithdraw(w.balance?.currency)} />}
         </FormField>
       )}
       {noAccounts ? (
